@@ -1,4 +1,4 @@
-import type { Promotion, SalesData, Product } from '@/types';
+import type { Promotion, SalesData, Product, OrganizationHierarchy } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -19,6 +19,17 @@ export const products: Product[] = [
     { id: 'PROD-005', name: 'Lemon-Lime Burst 300ml', sku: 'LLB300' },
 ];
 
+export const organizationHierarchy: OrganizationHierarchy[] = [
+    { id: 'HIER-R1', name: 'North', level: 'Region' },
+    { id: 'HIER-S1', name: 'Delhi NCR', level: 'State', parentId: 'HIER-R1' },
+    { id: 'HIER-A1', name: 'North Delhi', level: 'Area', parentId: 'HIER-S1' },
+    { id: 'HIER-D1', name: 'Gupta Distributors', level: 'Distributor', parentId: 'HIER-A1' },
+    { id: 'HIER-RET1', name: 'Sharma Kirana Store', level: 'Retailer', parentId: 'HIER-D1' },
+    { id: 'HIER-S2', name: 'Punjab', level: 'State', parentId: 'HIER-R1' },
+    { id: 'HIER-R2', name: 'West', level: 'Region' },
+    { id: 'HIER-S3', name: 'Maharashtra', level: 'State', parentId: 'HIER-R2' },
+];
+
 export const promotions: Promotion[] = [
   {
     id: 'PROMO-001',
@@ -30,7 +41,8 @@ export const promotions: Promotion[] = [
     uplift: 15.2,
     products: [
         { productId: 'PROD-001', buyQuantity: 6, getQuantity: 1, getSKU: 'PROD-001' }
-    ]
+    ],
+    hierarchyIds: ['HIER-R1']
   },
   {
     id: 'PROMO-002',
@@ -40,7 +52,8 @@ export const promotions: Promotion[] = [
     endDate: '2024-08-20',
     type: 'Bundle',
     uplift: 8.5,
-    products: []
+    products: [],
+    hierarchyIds: ['HIER-S1']
   },
   {
     id: 'PROMO-003',
@@ -50,7 +63,8 @@ export const promotions: Promotion[] = [
     endDate: '2024-11-15',
     type: 'Contest',
     uplift: 0,
-    products: []
+    products: [],
+    hierarchyIds: ['HIER-R1', 'HIER-R2']
   },
   {
     id: 'PROMO-004',
@@ -60,7 +74,8 @@ export const promotions: Promotion[] = [
     endDate: '2024-05-31',
     type: 'Freebie',
     uplift: 12.5,
-    products: []
+    products: [],
+    hierarchyIds: ['HIER-S3']
   },
   {
     id: 'PROMO-005',
@@ -70,6 +85,7 @@ export const promotions: Promotion[] = [
     endDate: '2024-03-25',
     type: 'Discount',
     uplift: 22.1,
-    products: []
+    products: [],
+    hierarchyIds: ['HIER-S1', 'HIER-S2']
   },
 ];

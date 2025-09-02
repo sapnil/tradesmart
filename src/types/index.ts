@@ -38,6 +38,13 @@ export type PromotionProduct = {
     getSKU: string;
 }
 
+export type OrganizationHierarchy = {
+  id: string;
+  name: string;
+  level: 'Region' | 'State' | 'Area' | 'Distributor' | 'Retailer';
+  parentId?: string;
+}
+
 export type Promotion = {
   id: string;
   schemeName: string;
@@ -47,4 +54,5 @@ export type Promotion = {
   type: PromotionType;
   uplift: number;
   products: PromotionProduct[];
+  hierarchyIds: string[];
 };

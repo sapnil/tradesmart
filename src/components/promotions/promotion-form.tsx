@@ -46,7 +46,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { products } from "@/lib/data";
+import { products, organizationHierarchy } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
 
 const promotionProductSchema = z.object({
@@ -64,6 +64,7 @@ const formSchema = z.object({
   endDate: z.date(),
   uplift: z.coerce.number().optional(),
   products: z.array(promotionProductSchema),
+  hierarchyIds: z.array(z.string()).min(1, "At least one hierarchy level is required."),
 });
 
 type PromotionFormValues = z.infer<typeof formSchema>;
@@ -77,11 +78,13 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     startDate: new Date(promotion.startDate),
     endDate: new Date(promotion.endDate),
     products: promotion.products || [],
+    hierarchyIds: promotion.hierarchyIds || [],
   } : {
     schemeName: "",
     status: "Upcoming" as const,
     uplift: 0,
     products: [],
+    hierarchyIds: [],
   };
 
   const form = useForm<PromotionFormValues>({
@@ -267,6 +270,35 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                 )}
               />
             </div>
+            
+            <FormField
+              control={form.control}
+              name="hierarchyIds"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Organization Hierarchy</FormLabel>
+                  {/* For simplicity, using a multi-select. A tree-view would be better for a real app. */}
+                  <Select onValueChange={(value) => field.onChange([...field.value, value])} >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select hierarchy levels to apply this promotion" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {organizationHierarchy.map((item) => (
+                        <SelectItem key={item.id} value={item.id} disabled={field.value?.includes(item.id)}>
+                          {item.name} ({item.level})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Selected: {form.getValues('hierarchyIds').map(id => organizationHierarchy.find(h => h.id === id)?.name).join(', ')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Card>
                 <CardHeader>

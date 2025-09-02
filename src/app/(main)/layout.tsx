@@ -17,6 +17,7 @@ import {
   Lightbulb,
   Bot,
   SlidersHorizontal,
+  Building,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -58,6 +59,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/promotions", icon: Megaphone, label: "Promotions" },
     { href: "/products", icon: Boxes, label: "Products" },
+    { href: "/hierarchy", icon: Building, label: "Hierarchy" },
     { href: "/rules", icon: SlidersHorizontal, label: "Rule Engine" },
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },

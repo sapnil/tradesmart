@@ -18,6 +18,7 @@ import {
   Bot,
   SlidersHorizontal,
   Building,
+  ShoppingCart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -58,6 +59,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/promotions", icon: Megaphone, label: "Promotions" },
+    { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Hierarchy" },
     { href: "/rules", icon: SlidersHorizontal, label: "Rule Engine" },

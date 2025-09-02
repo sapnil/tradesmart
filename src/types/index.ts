@@ -64,3 +64,12 @@ export type Promotion = {
   hierarchyIds: string[];
   productHierarchyIds: string[];
 };
+
+export type Order = {
+  id: string;
+  distributorName: string;
+  date: string;
+  amount: number;
+  status: 'Pending' | 'Fulfilled' | 'Cancelled';
+  appliedPromotionId?: string;
+};

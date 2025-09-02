@@ -1,4 +1,4 @@
-import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy } from '@/types';
+import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -104,4 +104,13 @@ export const promotions: Promotion[] = [
     hierarchyIds: ['HIER-S1', 'HIER-S2'],
     productHierarchyIds: ['BRAND-1'],
   },
+];
+
+export const orders: Order[] = [
+    { id: 'ORD-001', distributorName: 'Gupta Distributors', date: '2024-08-12', amount: 45000, status: 'Fulfilled', appliedPromotionId: 'PROMO-001' },
+    { id: 'ORD-002', distributorName: 'Patel Trading Co.', date: '2024-08-12', amount: 78000, status: 'Pending', appliedPromotionId: 'PROMO-002' },
+    { id: 'ORD-003', distributorName: 'Sharma & Sons', date: '2024-08-11', amount: 23500, status: 'Fulfilled' },
+    { id: 'ORD-004', distributorName: 'Modern Traders', date: '2024-08-10', amount: 112000, status: 'Fulfilled', appliedPromotionId: 'PROMO-001' },
+    { id: 'ORD-005', distributorName: 'Gupta Distributors', date: '2024-08-09', amount: 32000, status: 'Cancelled' },
+    { id: 'ORD-006', distributorName: 'Southern Wholesalers', date: '2024-08-08', amount: 56000, status: 'Fulfilled' },
 ];

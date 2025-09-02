@@ -71,11 +71,7 @@ import {
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 
-interface RuleBuilderProps {
-  rule: Rule;
-  onRuleChange: (rule: Rule) => void;
-}
-
+// #region Metadata
 const conditionMetadata = {
   DATE_RANGE: {
     icon: Calendar,
@@ -132,6 +128,22 @@ const actionMetadata = {
       'Set a fixed total price for all items matching the conditions.',
   },
 };
+// #endregion
+
+// #region Helper Functions and Components
+
+const handleMultiSelectChange = (
+  currentValues: string[] | undefined,
+  value: string,
+  onChange: (values: string[]) => void
+) => {
+  const newValues = currentValues ? [...currentValues] : [];
+  if (newValues.includes(value)) {
+    onChange(newValues.filter((v: string) => v !== value));
+  } else {
+    onChange([...newValues, value]);
+  }
+};
 
 const SortableItem = ({
   id,
@@ -165,7 +177,215 @@ const SortableItem = ({
 };
 
 
-export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
+function ConditionContent({ condition, index, updateCondition }: { condition: Condition, index: number, updateCondition: (index: number, newConfig: Condition['config']) => void }) {
+    switch (condition.type) {
+      case 'DATE_RANGE':
+        return (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Start Date</Label>
+              <Input type="date" value={condition.config.startDate} onChange={(e) => updateCondition(index, { ...condition.config, startDate: e.target.value })} />
+            </div>
+            <div>
+              <Label>End Date</Label>
+              <Input type="date" value={condition.config.endDate} onChange={(e) => updateCondition(index, { ...condition.config, endDate: e.target.value })} />
+            </div>
+          </div>
+        );
+      case 'CUSTOMER_HIERARCHY':
+        return (
+          <div>
+            <Label>Hierarchy Levels</Label>
+            <Select onValueChange={(value) => handleMultiSelectChange(condition.config.hierarchyIds, value, (values: string[]) => updateCondition(index, { hierarchyIds: values }))}>
+              <SelectTrigger><SelectValue placeholder="Select hierarchy levels..." /></SelectTrigger>
+              <SelectContent>
+                {organizationHierarchy.map((item) => <SelectItem key={item.id} value={item.id}>{item.name} ({item.level})</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {condition.config.hierarchyIds.map((id) => {
+                const item = organizationHierarchy.find((h) => h.id === id);
+                return item ? (
+                  <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                    {item.name}
+                    <button type="button" onClick={() => handleMultiSelectChange(condition.config.hierarchyIds, id, (values: string[]) => updateCondition(index, { hierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ) : null;
+              })}
+            </div>
+          </div>
+        );
+      case 'PRODUCT_HIERARCHY':
+        return (
+          <div>
+            <Label>Product Hierarchy</Label>
+            <Select onValueChange={(value) => handleMultiSelectChange(condition.config.productHierarchyIds, value, (values: string[]) => updateCondition(index, { productHierarchyIds: values }))}>
+              <SelectTrigger><SelectValue placeholder="Select product hierarchy levels..." /></SelectTrigger>
+              <SelectContent>
+                {productHierarchy.map((item) => <SelectItem key={item.id} value={item.id}>{item.name} ({item.level})</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {condition.config.productHierarchyIds.map((id) => {
+                const item = productHierarchy.find((h) => h.id === id);
+                return item ? (
+                  <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                    {item.name}
+                    <button type="button" onClick={() => handleMultiSelectChange(condition.config.productHierarchyIds, id, (values: string[]) => updateCondition(index, { productHierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ) : null;
+              })}
+            </div>
+          </div>
+        );
+      case 'PRODUCT_PURCHASE':
+        return (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Product</Label>
+              <Select value={condition.config.productId} onValueChange={(value) => updateCondition(index, { ...condition.config, productId: value })}>
+                <SelectTrigger><SelectValue placeholder="Select product..." /></SelectTrigger>
+                <SelectContent>
+                  {products.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Minimum Quantity</Label>
+              <Input type="number" value={condition.config.quantity} onChange={(e) => updateCondition(index, { ...condition.config, quantity: parseInt(e.target.value, 10) || 0 })} />
+            </div>
+          </div>
+        );
+      case 'TOTAL_ORDER_VALUE':
+        return (
+          <div>
+            <Label>Minimum Value</Label>
+            <Input type="number" value={condition.config.minValue} onChange={(e) => updateCondition(index, { ...condition.config, minValue: parseInt(e.target.value, 10) || 0 })} />
+          </div>
+        );
+      case 'TOTAL_ORDER_QUANTITY':
+        return (
+          <div>
+            <Label>Minimum Quantity</Label>
+            <Input type="number" value={condition.config.minQuantity} onChange={(e) => updateCondition(index, { ...condition.config, minQuantity: parseInt(e.target.value, 10) || 0 })} />
+          </div>
+        );
+      default:
+        return null;
+    }
+}
+
+function ActionContent({ action, index, updateAction }: { action: Action, index: number, updateAction: (index: number, newConfig: Action['config']) => void }) {
+    switch (action.type) {
+      case 'PERCENTAGE_DISCOUNT':
+        return (
+          <div>
+            <Label>Discount Percentage</Label>
+            <Input type="number" value={action.config.discountPercentage} onChange={(e) => updateAction(index, { ...action.config, discountPercentage: parseInt(e.target.value, 10) || 0 })} />
+          </div>
+        );
+      case 'FIXED_VALUE_DISCOUNT':
+        return (
+          <div>
+            <Label>Discount Amount</Label>
+            <Input type="number" value={action.config.discountValue} onChange={(e) => updateAction(index, { discountValue: parseInt(e.target.value, 10) || 0 })} />
+          </div>
+        );
+      case 'FREE_PRODUCT':
+        return (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Product</Label>
+              <Select value={action.config.productId} onValueChange={(value) => updateAction(index, { ...action.config, productId: value })}>
+                <SelectTrigger><SelectValue placeholder="Select product..." /></SelectTrigger>
+                <SelectContent>
+                  {products.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Quantity</Label>
+              <Input type="number" value={action.config.quantity} onChange={(e) => updateAction(index, { ...action.config, quantity: parseInt(e.target.value, 10) || 0 })} />
+            </div>
+          </div>
+        );
+      case 'BUNDLE_PRICE':
+        return (
+          <div>
+            <Label>Bundle Price</Label>
+            <Input type="number" value={action.config.bundlePrice} onChange={(e) => updateAction(index, { bundlePrice: parseInt(e.target.value, 10) || 0 })} />
+          </div>
+        );
+      default:
+        return null;
+    }
+}
+
+function ConditionCard({ condition, index, removeCondition, updateCondition }: { condition: Condition, index: number, removeCondition: (index: number) => void, updateCondition: (index: number, newConfig: Condition['config']) => void }) {
+    const meta = conditionMetadata[condition.type];
+    return (
+        <Card className="w-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-3">
+                <meta.icon className="h-6 w-6 text-muted-foreground" />
+                <div>
+                <CardTitle className="text-lg">{meta.label}</CardTitle>
+                <CardDescription className="text-xs">
+                    {meta.description}
+                </CardDescription>
+                </div>
+            </div>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeCondition(index)}
+            >
+                <Trash2 className="h-4 w-4" />
+            </Button>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-4">
+                <ConditionContent condition={condition} index={index} updateCondition={updateCondition} />
+            </CardContent>
+        </Card>
+    )
+}
+
+function ActionCard({ action, index, removeAction, updateAction }: { action: Action, index: number, removeAction: (index: number) => void, updateAction: (index: number, newConfig: Action['config']) => void }) {
+    const meta = actionMetadata[action.type];
+    return (
+        <Card className="w-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-3">
+                <meta.icon className="h-6 w-6 text-muted-foreground" />
+                <div>
+                <CardTitle className="text-lg">{meta.label}</CardTitle>
+                <CardDescription className="text-xs">
+                    {meta.description}
+                </CardDescription>
+                </div>
+            </div>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeAction(index)}
+            >
+                <Trash2 className="h-4 w-4" />
+            </Button>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-4">
+                <ActionContent action={action} index={index} updateAction={updateAction} />
+            </CardContent>
+      </Card>
+    )
+}
+
+// #endregion
+
+export function RuleBuilder({ rule, onRuleChange }: { rule: Rule, onRuleChange: (rule: Rule) => void }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -177,19 +397,6 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
     const newConditions = [...rule.conditions];
     newConditions[index] = { ...newConditions[index], config: newConfig as any };
     onRuleChange({ ...rule, conditions: newConditions });
-  };
-  
-  const handleMultiSelectChange = (
-    currentValues: string[] | undefined,
-    value: string,
-    onChange: (values: string[]) => void
-  ) => {
-    const newValues = currentValues ? [...currentValues] : [];
-    if (newValues.includes(value)) {
-      onChange(newValues.filter((v: string) => v !== value));
-    } else {
-      onChange([...newValues, value]);
-    }
   };
 
   const updateAction = (index: number, newConfig: Action['config']) => {
@@ -205,8 +412,8 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = rule[type].findIndex((item, i) => `${type}-${i}` === active.id);
-      const newIndex = rule[type].findIndex((item, i) => `${type}-${i}` === over.id);
+      const oldIndex = rule[type].findIndex((_, i) => `${type}-${i}` === active.id);
+      const newIndex = rule[type].findIndex((_, i) => `${type}-${i}` === over.id);
 
       onRuleChange({
         ...rule,
@@ -283,212 +490,6 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
     });
   };
 
-  const renderConditionContent = (condition: Condition, index: number) => {
-    switch(condition.type) {
-        case 'DATE_RANGE':
-            return (
-                <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                        <Label>Start Date</Label>
-                        <Input type='date' value={condition.config.startDate} onChange={e => updateCondition(index, {...condition.config, startDate: e.target.value})} />
-                    </div>
-                    <div>
-                        <Label>End Date</Label>
-                        <Input type='date' value={condition.config.endDate} onChange={e => updateCondition(index, {...condition.config, endDate: e.target.value})} />
-                    </div>
-                </div>
-            );
-        case 'CUSTOMER_HIERARCHY':
-            return (
-                <div>
-                  <Label>Hierarchy Levels</Label>
-                  <Select onValueChange={(value) => handleMultiSelectChange(condition.config.hierarchyIds, value, (values: string[]) => updateCondition(index, { hierarchyIds: values }))}>
-                      <SelectTrigger><SelectValue placeholder="Select hierarchy levels..." /></SelectTrigger>
-                      <SelectContent>
-                          {organizationHierarchy.map(item => <SelectItem key={item.id} value={item.id}>{item.name} ({item.level})</SelectItem>)}
-                      </SelectContent>
-                  </Select>
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {condition.config.hierarchyIds.map(id => {
-                        const item = organizationHierarchy.find(h => h.id === id);
-                        return item ? (
-                            <Badge key={id} variant="secondary" className="flex items-center gap-1">
-                                {item.name}
-                                <button type="button" onClick={() => handleMultiSelectChange(condition.config.hierarchyIds, id, (values: string[]) => updateCondition(index, { hierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
-                                    <X className="h-3 w-3"/>
-                                </button>
-                            </Badge>
-                        ) : null
-                    })}
-                  </div>
-                </div>
-            );
-        case 'PRODUCT_HIERARCHY':
-             return (
-                <div>
-                  <Label>Product Hierarchy</Label>
-                  <Select onValueChange={(value) => handleMultiSelectChange(condition.config.productHierarchyIds, value, (values: string[]) => updateCondition(index, { productHierarchyIds: values }))}>
-                      <SelectTrigger><SelectValue placeholder="Select product hierarchy levels..." /></SelectTrigger>
-                      <SelectContent>
-                          {productHierarchy.map(item => <SelectItem key={item.id} value={item.id}>{item.name} ({item.level})</SelectItem>)}
-                      </SelectContent>
-                  </Select>
-                   <div className="flex flex-wrap gap-2 pt-2">
-                    {condition.config.productHierarchyIds.map(id => {
-                        const item = productHierarchy.find(h => h.id === id);
-                        return item ? (
-                            <Badge key={id} variant="secondary" className="flex items-center gap-1">
-                                {item.name}
-                                <button type="button" onClick={() => handleMultiSelectChange(condition.config.productHierarchyIds, id, (values: string[]) => updateCondition(index, { productHierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
-                                    <X className="h-3 w-3"/>
-                                </button>
-                            </Badge>
-                        ) : null
-                    })}
-                  </div>
-                </div>
-            );
-        case 'PRODUCT_PURCHASE':
-            return (
-                 <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                        <Label>Product</Label>
-                        <Select value={condition.config.productId} onValueChange={value => updateCondition(index, {...condition.config, productId: value})}>
-                           <SelectTrigger><SelectValue placeholder="Select product..." /></SelectTrigger>
-                            <SelectContent>
-                                {products.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <Label>Minimum Quantity</Label>
-                        <Input type='number' value={condition.config.quantity} onChange={e => updateCondition(index, {...condition.config, quantity: parseInt(e.target.value, 10) || 0})} />
-                    </div>
-                </div>
-            );
-        case 'TOTAL_ORDER_VALUE':
-             return (
-                <div>
-                    <Label>Minimum Value</Label>
-                    <Input type='number' value={condition.config.minValue} onChange={e => updateCondition(index, {...condition.config, minValue: parseInt(e.target.value, 10) || 0})} />
-                </div>
-             );
-        case 'TOTAL_ORDER_QUANTITY':
-            return (
-                 <div>
-                    <Label>Minimum Quantity</Label>
-                    <Input type='number' value={condition.config.minQuantity} onChange={e => updateCondition(index, {...condition.config, minQuantity: parseInt(e.target.value, 10) || 0})} />
-                </div>
-            );
-        default:
-            return null;
-    }
-  };
-
-  const renderActionContent = (action: Action, index: number) => {
-    switch(action.type) {
-        case 'PERCENTAGE_DISCOUNT':
-            return (
-                <div>
-                    <Label>Discount Percentage</Label>
-                    <Input type='number' value={action.config.discountPercentage} onChange={e => updateAction(index, { ...action.config, discountPercentage: parseInt(e.target.value, 10) || 0 })} />
-                </div>
-            );
-        case 'FIXED_VALUE_DISCOUNT':
-            return (
-                <div>
-                    <Label>Discount Amount</Label>
-                    <Input type='number' value={action.config.discountValue} onChange={e => updateAction(index, { discountValue: parseInt(e.target.value, 10) || 0 })} />
-                </div>
-            );
-        case 'FREE_PRODUCT':
-             return (
-                 <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                        <Label>Product</Label>
-                        <Select value={action.config.productId} onValueChange={value => updateAction(index, {...action.config, productId: value})}>
-                           <SelectTrigger><SelectValue placeholder="Select product..." /></SelectTrigger>
-                            <SelectContent>
-                                {products.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <Label>Quantity</Label>
-                        <Input type='number' value={action.config.quantity} onChange={e => updateAction(index, {...action.config, quantity: parseInt(e.target.value, 10) || 0})} />
-                    </div>
-                </div>
-            );
-        case 'BUNDLE_PRICE':
-            return (
-                <div>
-                    <Label>Bundle Price</Label>
-                    <Input type='number' value={action.config.bundlePrice} onChange={e => updateAction(index, { bundlePrice: parseInt(e.target.value, 10) || 0 })} />
-                </div>
-            );
-        default:
-            return null;
-    }
-  };
-
-  const renderCondition = (condition: Condition, index: number) => {
-    const meta = conditionMetadata[condition.type];
-    return (
-      <Card key={index} className="w-full">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex items-center gap-3">
-            <meta.icon className="h-6 w-6 text-muted-foreground" />
-            <div>
-              <CardTitle className="text-lg">{meta.label}</CardTitle>
-              <CardDescription className="text-xs">
-                {meta.description}
-              </CardDescription>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => removeCondition(index)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4 pt-4">
-          {renderConditionContent(condition, index)}
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const renderAction = (action: Action, index: number) => {
-    const meta = actionMetadata[action.type];
-    return (
-      <Card key={index} className="w-full">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex items-center gap-3">
-            <meta.icon className="h-6 w-6 text-muted-foreground" />
-            <div>
-              <CardTitle className="text-lg">{meta.label}</CardTitle>
-              <CardDescription className="text-xs">
-                {meta.description}
-              </CardDescription>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => removeAction(index)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4 pt-4">
-           {renderActionContent(action, index)}
-        </CardContent>
-      </Card>
-    );
-  };
-
   return (
     <div className="space-y-8">
       <Card>
@@ -532,7 +533,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
               <div className="space-y-4">
                 {rule.conditions.map((c, i) => (
                   <SortableItem key={`conditions-${i}`} id={`conditions-${i}`}>
-                    {renderCondition(c, i)}
+                    <ConditionCard condition={c} index={i} removeCondition={removeCondition} updateCondition={updateCondition} />
                   </SortableItem>
                 ))}
               </div>
@@ -580,7 +581,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
               <div className="space-y-4">
                 {rule.actions.map((a, i) => (
                   <SortableItem key={`actions-${i}`} id={`actions-${i}`}>
-                    {renderAction(a, i)}
+                    <ActionCard action={a} index={i} removeAction={removeAction} updateAction={updateAction} />
                   </SortableItem>
                 ))}
               </div>

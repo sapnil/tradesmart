@@ -3,12 +3,33 @@ export type SalesData = {
   sales: number;
 };
 
+export const promotionTypes = [
+  'Quantity Price Schemes (QPS)',
+  'Rebate and Loyalty Programs',
+  'Free Goods and Sampling Schemes',
+  'Channel-Specific Schemes',
+  'Retailer Channel-Group Specific Schemes',
+  'Strategic Implementation Approaches',
+  'Seasonal and Geographic Promotions',
+  'Liquidation Schemes',
+  'Cross-Sell and Bundling Programs',
+  'Performance-Driven Incentives',
+  'Trade Contests and Incentives',
+  'Display and Visibility Support',
+  'Discount',
+  'Bundle',
+  'Freebie',
+  'Contest',
+] as const;
+
+export type PromotionType = (typeof promotionTypes)[number];
+
 export type Promotion = {
   id: string;
   schemeName: string;
   status: 'Active' | 'Upcoming' | 'Expired';
   startDate: string;
   endDate: string;
-  type: 'Discount' | 'Bundle' | 'Freebie' | 'Contest';
+  type: PromotionType;
   uplift: number;
 };

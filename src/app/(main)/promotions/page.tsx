@@ -66,7 +66,7 @@ export default function PromotionsPage() {
               </span>
             </Button>
             <Button asChild size="sm" className="h-8 gap-1">
-              <Link href="/ai-schemes">
+              <Link href="/promotions/create">
                 <PlusCircle className="h-3.5 w-3.5" />
                 <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                   Create Promotion
@@ -95,7 +95,11 @@ export default function PromotionsPage() {
             <TableBody>
               {promotions.map((promo) => (
                 <TableRow key={promo.id}>
-                  <TableCell className="font-medium">{promo.schemeName}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/promotions/${promo.id}/edit`} className="hover:underline">
+                      {promo.schemeName}
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={promo.status === 'Active' ? 'default' : promo.status === 'Upcoming' ? 'secondary' : 'outline'} className={promo.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/20 hover:bg-green-500/30' : ''}>
                         {promo.status}

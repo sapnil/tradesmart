@@ -76,7 +76,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
   const router = useRouter();
   const { toast } = useToast();
 
-  const defaultValues = promotion ? {
+  const defaultValues: PromotionFormValues = promotion ? {
     ...promotion,
     startDate: new Date(promotion.startDate),
     endDate: new Date(promotion.endDate),
@@ -85,7 +85,10 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     productHierarchyIds: promotion.productHierarchyIds || [],
   } : {
     schemeName: "",
-    status: "Upcoming" as const,
+    type: "Discount",
+    status: "Upcoming",
+    startDate: new Date(),
+    endDate: new Date(new Date().setDate(new Date().getDate() + 30)),
     uplift: 0,
     products: [],
     hierarchyIds: [],
@@ -124,7 +127,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
         variant: "destructive",
     });
     router.push("/promotions");
-  }
+  };
 
   const handleMultiSelectChange = (field: any, value: string) => {
     const currentValues = field.value || [];

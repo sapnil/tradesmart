@@ -31,6 +31,7 @@ import {
   Cog,
   BookCopy,
   FlaskConical,
+  Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -74,8 +75,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
-    { href: "/organization-groups", icon: Users, label: "Organization Groups" },
     { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
+  ];
+
+  const setupNavItems = [
+     { href: "/organization-groups", icon: Users, label: "Organization Groups" },
   ];
 
   const aiToolsNavItems = [
@@ -134,6 +138,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarGroupLabel>Reports</SidebarGroupLabel>
             <SidebarMenu>
               {reportsNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+           <SidebarGroup>
+            <SidebarGroupLabel>Setup</SidebarGroupLabel>
+            <SidebarMenu>
+              {setupNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton asChild tooltip={item.label}>
                     <Link href={item.href}>

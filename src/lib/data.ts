@@ -67,6 +67,11 @@ export const promotions: Promotion[] = [
     products: [],
     hierarchyIds: ['HIER-S1'],
     productHierarchyIds: ['BRAND-1'],
+    bundleProducts: [
+      { productId: 'PROD-002', quantity: 1},
+      { productId: 'PROD-004', quantity: 1},
+    ],
+    bundlePrice: 65,
   },
   {
     id: 'PROMO-003',

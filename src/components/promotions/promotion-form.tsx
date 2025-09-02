@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,6 +68,12 @@ const discountTierSchema = z.object({
     discountPercentage: z.coerce.number().min(1, "Discount must be at least 1%.").max(100, "Discount cannot exceed 100%."),
 });
 
+const bundleProductSchema = z.object({
+    productId: z.string().min(1, "Product is required."),
+    quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
+});
+
+
 const formSchema = z.object({
   schemeName: z.string().min(3, "Scheme name must be at least 3 characters."),
   type: z.enum(promotionTypes),
@@ -76,6 +83,8 @@ const formSchema = z.object({
   uplift: z.coerce.number().optional(),
   products: z.array(promotionProductSchema).optional(),
   discountTiers: z.array(discountTierSchema).optional(),
+  bundleProducts: z.array(bundleProductSchema).optional(),
+  bundlePrice: z.coerce.number().optional(),
   hierarchyIds: z.array(z.string()).min(1, "At least one hierarchy level is required."),
   productHierarchyIds: z.array(z.string()).min(1, "At least one product hierarchy level is required."),
 });
@@ -99,6 +108,8 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       uplift: promotion?.uplift || 0,
       products: promotion?.products || [],
       discountTiers: promotion?.discountTiers || [],
+      bundleProducts: promotion?.bundleProducts || [],
+      bundlePrice: promotion?.bundlePrice || 0,
       hierarchyIds: promotion?.hierarchyIds || [],
       productHierarchyIds: promotion?.productHierarchyIds || []
     },
@@ -112,6 +123,11 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
   const { fields: tierFields, append: appendTier, remove: removeTier } = useFieldArray({
     control: form.control,
     name: "discountTiers",
+  });
+
+  const { fields: bundleFields, append: appendBundleProduct, remove: removeBundleProduct } = useFieldArray({
+    control: form.control,
+    name: "bundleProducts",
   });
 
 
@@ -579,6 +595,91 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                     </Button>
                 </CardContent>
             </Card>
+            )}
+
+            {selectedPromotionType === 'Bundle' && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Product Bundle</CardTitle>
+                        <FormDescription>Define the products included in the bundle and the final bundle price.</FormDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {bundleFields.map((field, index) => (
+                            <div key={field.id} className="flex gap-4 items-end border p-4 rounded-md relative">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute top-2 right-2"
+                                    onClick={() => removeBundleProduct(index)}
+                                >
+                                    <Trash className="h-4 w-4" />
+                                </Button>
+                                <FormField
+                                    control={form.control}
+                                    name={`bundleProducts.${index}.productId`}
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Product</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a product" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {products.map((product) => (
+                                                        <SelectItem key={product.id} value={product.id}>
+                                                            {product.name} ({product.sku})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`bundleProducts.${index}.quantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Quantity</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 1" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        ))}
+                         <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => appendBundleProduct({ productId: '', quantity: 1 })}
+                        >
+                           <PlusCircle className="mr-2 h-4 w-4" /> Add Product to Bundle
+                        </Button>
+
+                        <Separator />
+
+                         <FormField
+                            control={form.control}
+                            name="bundlePrice"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Total Bundle Price</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="e.g. 150" {...field} className="max-w-xs" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                </Card>
             )}
 
 

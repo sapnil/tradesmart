@@ -1,4 +1,5 @@
 
+
 export type SalesData = {
   month: string;
   sales: number;
@@ -46,6 +47,11 @@ export type PromotionProduct = {
     getSKU: string;
 }
 
+export type BundleProduct = {
+    productId: string;
+    quantity: number;
+}
+
 export type DiscountTier = {
     minQuantity: number;
     maxQuantity: number;
@@ -71,6 +77,8 @@ export type Promotion = {
   hierarchyIds: string[];
   productHierarchyIds: string[];
   discountTiers?: DiscountTier[];
+  bundleProducts?: BundleProduct[];
+  bundlePrice?: number;
 };
 
 export type OrderItem = {

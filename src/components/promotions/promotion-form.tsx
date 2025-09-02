@@ -77,20 +77,16 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
   
   const form = useForm<PromotionFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: promotion ? {
-        ...promotion,
-        startDate: new Date(promotion.startDate),
-        endDate: new Date(promotion.endDate),
-    } : {
-        schemeName: "",
-        type: "Discount",
-        status: "Upcoming",
-        startDate: new Date(),
-        endDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-        uplift: 0,
-        products: [],
-        hierarchyIds: [],
-        productHierarchyIds: [],
+    defaultValues: {
+      schemeName: promotion?.schemeName || "",
+      type: promotion?.type || "Discount",
+      status: promotion?.status || "Upcoming",
+      startDate: promotion?.startDate ? new Date(promotion.startDate) : new Date(),
+      endDate: promotion?.endDate ? new Date(promotion.endDate) : new Date(new Date().setDate(new Date().getDate() + 30)),
+      uplift: promotion?.uplift || 0,
+      products: promotion?.products || [],
+      hierarchyIds: promotion?.hierarchyIds || [],
+      productHierarchyIds: promotion?.productHierarchyIds || [],
     },
   });
 
@@ -384,7 +380,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a product to apply promotion" />
-                                                </Trigger>
+                                                </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {products.map((product) => (
@@ -435,7 +431,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select free product" />
-                                                </Trigger>
+                                                </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {products.map((product) => (
@@ -518,3 +514,5 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     </Card>
   );
 }
+
+    

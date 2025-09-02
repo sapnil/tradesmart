@@ -26,7 +26,7 @@ import { Loader2, Sparkles, Wand2 } from "lucide-react";
 import { orders, promotions, organizationHierarchy, productHierarchy } from "@/lib/data";
 import { applyPromotionRules, ApplyPromotionRulesOutput } from "@/ai/flows/apply-promotion-rules";
 import Link from "next/link";
-import { Badge } from "../ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
   orderId: z.string().min(1, { message: "Please select an order." }),

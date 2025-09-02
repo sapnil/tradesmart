@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import {
   Card,
@@ -22,6 +26,8 @@ import {
 } from "@/lib/data";
 import Link from "next/link";
 import { type Promotion } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type ParticipationInfo = {
     promotion: Promotion;
@@ -29,7 +35,11 @@ type ParticipationInfo = {
 }
 
 export default function ParticipationReportPage() {
+  const [selectedPromotionId, setSelectedPromotionId] = useState<string | null>(null);
+  const [selectedDistributorId, setSelectedDistributorId] = useState<string | null>(null);
+
   const activePromotions = promotions.filter((p) => p.status === "Active");
+  const distributors = organizationHierarchy.filter(h => h.level === 'Distributor');
   const retailers = organizationHierarchy.filter(h => h.level === 'Retailer');
 
   const getRetailerParent = (retailerId: string) => {
@@ -71,6 +81,23 @@ export default function ParticipationReportPage() {
       maximumFractionDigits: 0,
     }).format(amount);
 
+  const filteredRetailers = retailers.filter(retailer => {
+    const distributorId = getRetailerParent(retailer.id);
+    if (selectedDistributorId && distributorId !== selectedDistributorId) {
+      return false;
+    }
+    if (selectedPromotionId) {
+      const participatingPromos = getParticipatingPromotions(retailer.id);
+      return participatingPromos.some(p => p.promotion.id === selectedPromotionId);
+    }
+    return true;
+  });
+
+  const clearFilters = () => {
+    setSelectedPromotionId(null);
+    setSelectedDistributorId(null);
+  };
+
   return (
     <>
       <PageHeader
@@ -83,6 +110,33 @@ export default function ParticipationReportPage() {
           <CardDescription>
             This report shows which active promotions each retailer is participating in based on distributor orders.
           </CardDescription>
+          <div className="flex items-center gap-4 pt-4">
+              <Select value={selectedPromotionId ?? 'all'} onValueChange={(value) => setSelectedPromotionId(value === 'all' ? null : value)}>
+                  <SelectTrigger className="w-[280px]">
+                      <SelectValue placeholder="Filter by promotion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="all">All Promotions</SelectItem>
+                      {activePromotions.map(promo => (
+                          <SelectItem key={promo.id} value={promo.id}>{promo.schemeName}</SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
+              <Select value={selectedDistributorId ?? 'all'} onValueChange={(value) => setSelectedDistributorId(value === 'all' ? null : value)}>
+                  <SelectTrigger className="w-[280px]">
+                      <SelectValue placeholder="Filter by distributor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="all">All Distributors</SelectItem>
+                      {distributors.map(dist => (
+                          <SelectItem key={dist.id} value={dist.id}>{dist.name}</SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
+              {(selectedPromotionId || selectedDistributorId) && (
+                <Button variant="ghost" onClick={clearFilters}>Clear Filters</Button>
+              )}
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -95,7 +149,7 @@ export default function ParticipationReportPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {retailers.map((retailer) => {
+              {filteredRetailers.map((retailer) => {
                 const participatingPromos = getParticipatingPromotions(retailer.id);
                 const distributorId = getRetailerParent(retailer.id);
                 const distributorName = getDistributorName(distributorId);
@@ -129,6 +183,13 @@ export default function ParticipationReportPage() {
                   </TableRow>
                 );
               })}
+              {filteredRetailers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center h-24">
+                    No results found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

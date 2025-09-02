@@ -297,7 +297,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                         <Input type='date' value={condition.config.endDate} onChange={e => updateCondition(index, {...condition.config, endDate: e.target.value})} />
                     </div>
                 </div>
-            )
+            );
         case 'CUSTOMER_HIERARCHY':
             return (
                 <div>
@@ -322,7 +322,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                     })}
                   </div>
                 </div>
-            )
+            );
         case 'PRODUCT_HIERARCHY':
              return (
                 <div>
@@ -347,7 +347,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                     })}
                   </div>
                 </div>
-            )
+            );
         case 'PRODUCT_PURCHASE':
             return (
                  <div className='grid grid-cols-2 gap-4'>
@@ -365,25 +365,25 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                         <Input type='number' value={condition.config.quantity} onChange={e => updateCondition(index, {...condition.config, quantity: parseInt(e.target.value, 10) || 0})} />
                     </div>
                 </div>
-            )
+            );
         case 'TOTAL_ORDER_VALUE':
              return (
                 <div>
                     <Label>Minimum Value</Label>
                     <Input type='number' value={condition.config.minValue} onChange={e => updateCondition(index, {...condition.config, minValue: parseInt(e.target.value, 10) || 0})} />
                 </div>
-             )
+             );
         case 'TOTAL_ORDER_QUANTITY':
             return (
                  <div>
                     <Label>Minimum Quantity</Label>
                     <Input type='number' value={condition.config.minQuantity} onChange={e => updateCondition(index, {...condition.config, minQuantity: parseInt(e.target.value, 10) || 0})} />
                 </div>
-            )
+            );
         default:
-            return null
+            return null;
     }
-  }
+  };
 
   const renderActionContent = (action: Action, index: number) => {
     switch(action.type) {
@@ -393,14 +393,14 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                     <Label>Discount Percentage</Label>
                     <Input type='number' value={action.config.discountPercentage} onChange={e => updateAction(index, { ...action.config, discountPercentage: parseInt(e.target.value, 10) || 0 })} />
                 </div>
-            )
+            );
         case 'FIXED_VALUE_DISCOUNT':
             return (
                 <div>
                     <Label>Discount Amount</Label>
                     <Input type='number' value={action.config.discountValue} onChange={e => updateAction(index, { discountValue: parseInt(e.target.value, 10) || 0 })} />
                 </div>
-            )
+            );
         case 'FREE_PRODUCT':
              return (
                  <div className='grid grid-cols-2 gap-4'>
@@ -418,18 +418,18 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                         <Input type='number' value={action.config.quantity} onChange={e => updateAction(index, {...action.config, quantity: parseInt(e.target.value, 10) || 0})} />
                     </div>
                 </div>
-            )
+            );
         case 'BUNDLE_PRICE':
             return (
                 <div>
                     <Label>Bundle Price</Label>
                     <Input type='number' value={action.config.bundlePrice} onChange={e => updateAction(index, { bundlePrice: parseInt(e.target.value, 10) || 0 })} />
                 </div>
-            )
+            );
         default:
-            return null
+            return null;
     }
-  }
+  };
 
   const renderCondition = (condition: Condition, index: number) => {
     const meta = conditionMetadata[condition.type];

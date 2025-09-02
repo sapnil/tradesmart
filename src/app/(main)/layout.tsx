@@ -68,7 +68,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/promotions", icon: Megaphone, label: "Promotions" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
-    { href: "/hierarchy", icon: Building, label: "Hierarchy" },
+    { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
     { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
   ];
 
@@ -81,7 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ];
 
   const reportsNavItems = [
-    { href: "/participation-report", icon: Users, label: "Retailer Report"},
+    { href: "/participation-report", icon: Users, label: "Retailer Participation Report"},
     { href: "/retailer-profiling", icon: FileText, label: "Retailer Profiling"},
   ]
 

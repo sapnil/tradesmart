@@ -1,3 +1,4 @@
+
 import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order } from '@/types';
 
 export const salesData: SalesData[] = [
@@ -125,6 +126,35 @@ export const promotions: Promotion[] = [
         { minQuantity: 50, maxQuantity: 99, discountPercentage: 10 },
         { minQuantity: 100, maxQuantity: 9999, discountPercentage: 15 },
     ]
+  },
+  {
+    id: 'PROMO-007',
+    schemeName: 'Value-Based Offer',
+    status: 'Upcoming',
+    startDate: '2024-09-01',
+    endDate: '2024-09-30',
+    type: 'Value-Based Discount',
+    uplift: 0,
+    products: [],
+    hierarchyIds: ['HIER-S1'],
+    productHierarchyIds: ['BRAND-1'],
+    minValue: 5000,
+    discountValue: 250,
+  },
+  {
+    id: 'PROMO-008',
+    schemeName: 'Must Stock Offer',
+    status: 'Active',
+    startDate: '2024-08-15',
+    endDate: '2024-09-15',
+    type: 'Forced-Buy / Must-Stock',
+    uplift: 0,
+    products: [],
+    hierarchyIds: ['HIER-D1'],
+    productHierarchyIds: ['SKU-1'],
+    mustBuyProducts: [
+      { productId: 'PROD-005', quantity: 5 }
+    ],
   },
 ];
 

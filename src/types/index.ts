@@ -9,6 +9,9 @@ export const promotionTypes = [
   'Discount', // Simple discount %
   'Tiered Volume Discount', // Discount % based on quantity
   'Quantity Price Schemes (QPS)', // Buy X Get Y
+  'Bundle',
+  'Value-Based Discount', // Discount on minimum purchase value
+  'Forced-Buy / Must-Stock', // Discount on one product conditional on buying another
   'Rebate and Loyalty Programs',
   'Free Goods and Sampling Schemes',
   'Channel-Specific Schemes',
@@ -20,7 +23,6 @@ export const promotionTypes = [
   'Performance-Driven Incentives',
   'Trade Contests and Incentives',
   'Display and Visibility Support',
-  'Bundle',
   'Freebie',
   'Contest',
 ] as const;
@@ -52,6 +54,12 @@ export type BundleProduct = {
     quantity: number;
 }
 
+export type MustBuyProduct = {
+    productId: string;
+    quantity: number;
+}
+
+
 export type DiscountTier = {
     minQuantity: number;
     maxQuantity: number;
@@ -79,6 +87,9 @@ export type Promotion = {
   discountTiers?: DiscountTier[];
   bundleProducts?: BundleProduct[];
   bundlePrice?: number;
+  minValue?: number;
+  discountValue?: number;
+  mustBuyProducts?: MustBuyProduct[];
 };
 
 export type OrderItem = {

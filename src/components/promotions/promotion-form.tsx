@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -73,6 +73,11 @@ const bundleProductSchema = z.object({
     quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
 });
 
+const mustBuyProductSchema = z.object({
+    productId: z.string().min(1, "Product is required."),
+    quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
+});
+
 
 const formSchema = z.object({
   schemeName: z.string().min(3, "Scheme name must be at least 3 characters."),
@@ -87,6 +92,9 @@ const formSchema = z.object({
   bundlePrice: z.coerce.number().optional(),
   hierarchyIds: z.array(z.string()).min(1, "At least one hierarchy level is required."),
   productHierarchyIds: z.array(z.string()).min(1, "At least one product hierarchy level is required."),
+  minValue: z.coerce.number().optional(),
+  discountValue: z.coerce.number().optional(),
+  mustBuyProducts: z.array(mustBuyProductSchema).optional(),
 });
 
 type PromotionFormValues = z.infer<typeof formSchema>;
@@ -111,7 +119,10 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       bundleProducts: promotion?.bundleProducts || [],
       bundlePrice: promotion?.bundlePrice || 0,
       hierarchyIds: promotion?.hierarchyIds || [],
-      productHierarchyIds: promotion?.productHierarchyIds || []
+      productHierarchyIds: promotion?.productHierarchyIds || [],
+      minValue: promotion?.minValue || 0,
+      discountValue: promotion?.discountValue || 0,
+      mustBuyProducts: promotion?.mustBuyProducts || [],
     },
   });
 
@@ -128,6 +139,11 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
   const { fields: bundleFields, append: appendBundleProduct, remove: removeBundleProduct } = useFieldArray({
     control: form.control,
     name: "bundleProducts",
+  });
+
+  const { fields: mustBuyFields, append: appendMustBuy, remove: removeMustBuy } = useFieldArray({
+    control: form.control,
+    name: "mustBuyProducts",
   });
 
 
@@ -601,7 +617,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                 <Card>
                     <CardHeader>
                         <CardTitle>Product Bundle</CardTitle>
-                        <FormDescription>Define the products included in the bundle and the final bundle price.</FormDescription>
+                        <CardDescription>Define the products included in the bundle and the final bundle price.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {bundleFields.map((field, index) => (
@@ -678,6 +694,114 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                                 </FormItem>
                             )}
                         />
+                    </CardContent>
+                </Card>
+            )}
+
+            {selectedPromotionType === 'Value-Based Discount' && (
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Value-Based Discount</CardTitle>
+                        <CardDescription>Give a discount when the order value for targeted products reaches a certain amount.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                           <FormField
+                                control={form.control}
+                                name="minValue"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Minimum Purchase Value</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="e.g. 10000" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="discountValue"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Discount Amount</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="e.g. 500" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {selectedPromotionType === 'Forced-Buy / Must-Stock' && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Forced-Buy / Must-Stock</CardTitle>
+                        <CardDescription>Define a set of products that must be purchased to qualify for the promotion. The discount will apply to all items targeted by the 'Product Hierarchy' selection.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {mustBuyFields.map((field, index) => (
+                            <div key={field.id} className="flex gap-4 items-end border p-4 rounded-md relative">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute top-2 right-2"
+                                    onClick={() => removeMustBuy(index)}
+                                >
+                                    <Trash className="h-4 w-4" />
+                                </Button>
+                                <FormField
+                                    control={form.control}
+                                    name={`mustBuyProducts.${index}.productId`}
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Product</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a product" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {products.map((product) => (
+                                                        <SelectItem key={product.id} value={product.id}>
+                                                            {product.name} ({product.sku})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`mustBuyProducts.${index}.quantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Min Quantity</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 5" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        ))}
+                         <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => appendMustBuy({ productId: '', quantity: 1 })}
+                        >
+                           <PlusCircle className="mr-2 h-4 w-4" /> Add Must-Buy Product
+                        </Button>
                     </CardContent>
                 </Card>
             )}

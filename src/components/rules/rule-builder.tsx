@@ -164,6 +164,7 @@ const SortableItem = ({
   );
 };
 
+
 export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -171,73 +172,6 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  const handleDragEnd = (
-    event: DragEndEvent,
-    type: 'conditions' | 'actions'
-  ) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = rule[type].findIndex((item, i) => `${type}-${i}` === active.id);
-      const newIndex = rule[type].findIndex((item, i) => `${type}-${i}` === over.id);
-
-      onRuleChange({
-        ...rule,
-        [type]: arrayMove(rule[type], oldIndex, newIndex),
-      });
-    }
-  };
-
-  const addCondition = (type: Condition['type']) => {
-    let newCondition: Condition;
-    switch (type) {
-      case 'DATE_RANGE':
-        newCondition = {
-          type,
-          config: { startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] },
-        };
-        break;
-      case 'CUSTOMER_HIERARCHY':
-        newCondition = { type, config: { hierarchyIds: [] } };
-        break;
-      case 'PRODUCT_HIERARCHY':
-        newCondition = { type, config: { productHierarchyIds: [] } };
-        break;
-      case 'PRODUCT_PURCHASE':
-        newCondition = { type, config: { productId: '', quantity: 1 } };
-        break;
-      case 'TOTAL_ORDER_VALUE':
-        newCondition = { type, config: { minValue: 0 } };
-        break;
-      case 'TOTAL_ORDER_QUANTITY':
-        newCondition = { type, config: { productHierarchyIds: [], minQuantity: 1 } };
-        break;
-    }
-    onRuleChange({
-      ...rule,
-      conditions: [...rule.conditions, newCondition],
-    });
-  };
-
-  const addAction = (type: Action['type']) => {
-    let newAction: Action;
-    switch (type) {
-      case 'PERCENTAGE_DISCOUNT':
-        newAction = { type, config: { discountPercentage: 10, applicableProductHierarchyIds: [] } };
-        break;
-      case 'FIXED_VALUE_DISCOUNT':
-        newAction = { type, config: { discountValue: 100 } };
-        break;
-      case 'FREE_PRODUCT':
-        newAction = { type, config: { productId: '', quantity: 1 } };
-        break;
-      case 'BUNDLE_PRICE':
-        newAction = { type, config: { bundlePrice: 100 } };
-        break;
-    }
-    onRuleChange({ ...rule, actions: [...rule.actions, newAction] });
-  };
 
   const updateCondition = (index: number, newConfig: Condition['config']) => {
     const newConditions = [...rule.conditions];
@@ -264,20 +198,6 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
     onRuleChange({ ...rule, actions: newActions });
   };
 
-  const removeCondition = (index: number) => {
-    onRuleChange({
-      ...rule,
-      conditions: rule.conditions.filter((_, i) => i !== index),
-    });
-  };
-
-  const removeAction = (index: number) => {
-    onRuleChange({
-      ...rule,
-      actions: rule.actions.filter((_, i) => i !== index),
-    });
-  };
-
   const renderConditionContent = (condition: Condition, index: number) => {
     switch(condition.type) {
         case 'DATE_RANGE':
@@ -297,7 +217,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
             return (
                 <div>
                   <Label>Hierarchy Levels</Label>
-                  <Select onValueChange={(value) => handleMultiSelectChange(condition.config.hierarchyIds, value, (values) => updateCondition(index, { hierarchyIds: values }))}>
+                  <Select onValueChange={(value) => handleMultiSelectChange(condition.config.hierarchyIds, value, (values: string[]) => updateCondition(index, { hierarchyIds: values }))}>
                       <SelectTrigger><SelectValue placeholder="Select hierarchy levels..." /></SelectTrigger>
                       <SelectContent>
                           {organizationHierarchy.map(item => <SelectItem key={item.id} value={item.id}>{item.name} ({item.level})</SelectItem>)}
@@ -309,7 +229,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                         return item ? (
                             <Badge key={id} variant="secondary" className="flex items-center gap-1">
                                 {item.name}
-                                <button type="button" onClick={() => handleMultiSelectChange(condition.config.hierarchyIds, id, (values) => updateCondition(index, { hierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                <button type="button" onClick={() => handleMultiSelectChange(condition.config.hierarchyIds, id, (values: string[]) => updateCondition(index, { hierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
                                     <X className="h-3 w-3"/>
                                 </button>
                             </Badge>
@@ -322,7 +242,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
              return (
                 <div>
                   <Label>Product Hierarchy</Label>
-                  <Select onValueChange={(value) => handleMultiSelectChange(condition.config.productHierarchyIds, value, (values) => updateCondition(index, { productHierarchyIds: values }))}>
+                  <Select onValueChange={(value) => handleMultiSelectChange(condition.config.productHierarchyIds, value, (values: string[]) => updateCondition(index, { productHierarchyIds: values }))}>
                       <SelectTrigger><SelectValue placeholder="Select product hierarchy levels..." /></SelectTrigger>
                       <SelectContent>
                           {productHierarchy.map(item => <SelectItem key={item.id} value={item.id}>{item.name} ({item.level})</SelectItem>)}
@@ -334,7 +254,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                         return item ? (
                             <Badge key={id} variant="secondary" className="flex items-center gap-1">
                                 {item.name}
-                                <button type="button" onClick={() => handleMultiSelectChange(condition.config.productHierarchyIds, id, (values) => updateCondition(index, { productHierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                <button type="button" onClick={() => handleMultiSelectChange(condition.config.productHierarchyIds, id, (values: string[]) => updateCondition(index, { productHierarchyIds: values }))} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
                                     <X className="h-3 w-3"/>
                                 </button>
                             </Badge>
@@ -425,6 +345,88 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
             return null
     }
   }
+
+
+  const handleDragEnd = (
+    event: DragEndEvent,
+    type: 'conditions' | 'actions'
+  ) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = rule[type].findIndex((item, i) => `${type}-${i}` === active.id);
+      const newIndex = rule[type].findIndex((item, i) => `${type}-${i}` === over.id);
+
+      onRuleChange({
+        ...rule,
+        [type]: arrayMove(rule[type], oldIndex, newIndex),
+      });
+    }
+  };
+
+  const addCondition = (type: Condition['type']) => {
+    let newCondition: Condition;
+    switch (type) {
+      case 'DATE_RANGE':
+        newCondition = {
+          type,
+          config: { startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] },
+        };
+        break;
+      case 'CUSTOMER_HIERARCHY':
+        newCondition = { type, config: { hierarchyIds: [] } };
+        break;
+      case 'PRODUCT_HIERARCHY':
+        newCondition = { type, config: { productHierarchyIds: [] } };
+        break;
+      case 'PRODUCT_PURCHASE':
+        newCondition = { type, config: { productId: '', quantity: 1 } };
+        break;
+      case 'TOTAL_ORDER_VALUE':
+        newCondition = { type, config: { minValue: 0 } };
+        break;
+      case 'TOTAL_ORDER_QUANTITY':
+        newCondition = { type, config: { productHierarchyIds: [], minQuantity: 1 } };
+        break;
+    }
+    onRuleChange({
+      ...rule,
+      conditions: [...rule.conditions, newCondition],
+    });
+  };
+
+  const addAction = (type: Action['type']) => {
+    let newAction: Action;
+    switch (type) {
+      case 'PERCENTAGE_DISCOUNT':
+        newAction = { type, config: { discountPercentage: 10, applicableProductHierarchyIds: [] } };
+        break;
+      case 'FIXED_VALUE_DISCOUNT':
+        newAction = { type, config: { discountValue: 100 } };
+        break;
+      case 'FREE_PRODUCT':
+        newAction = { type, config: { productId: '', quantity: 1 } };
+        break;
+      case 'BUNDLE_PRICE':
+        newAction = { type, config: { bundlePrice: 100 } };
+        break;
+    }
+    onRuleChange({ ...rule, actions: [...rule.actions, newAction] });
+  };
+
+  const removeCondition = (index: number) => {
+    onRuleChange({
+      ...rule,
+      conditions: rule.conditions.filter((_, i) => i !== index),
+    });
+  };
+
+  const removeAction = (index: number) => {
+    onRuleChange({
+      ...rule,
+      actions: rule.actions.filter((_, i) => i !== index),
+    });
+  };
 
   const renderCondition = (condition: Condition, index: number) => {
     const meta = conditionMetadata[condition.type];

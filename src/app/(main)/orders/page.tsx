@@ -54,7 +54,11 @@ export default function OrdersPage() {
             <TableBody>
               {orders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/orders/${order.id}`} className="hover:underline text-primary">
+                      {order.id}
+                    </Link>
+                  </TableCell>
                   <TableCell>{order.distributorName}</TableCell>
                   <TableCell>{order.date}</TableCell>
                   <TableCell>

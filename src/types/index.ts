@@ -65,6 +65,12 @@ export type Promotion = {
   productHierarchyIds: string[];
 };
 
+export type OrderItem = {
+  productId: string;
+  quantity: number;
+  price: number;
+};
+
 export type Order = {
   id: string;
   distributorName: string;
@@ -72,4 +78,5 @@ export type Order = {
   amount: number;
   status: 'Pending' | 'Fulfilled' | 'Cancelled';
   appliedPromotionId?: string;
+  items: OrderItem[];
 };

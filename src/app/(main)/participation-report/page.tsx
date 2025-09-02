@@ -23,6 +23,11 @@ import {
 import Link from "next/link";
 import { type Promotion } from "@/types";
 
+type ParticipationInfo = {
+    promotion: Promotion;
+    totalValue: number;
+}
+
 export default function ParticipationReportPage() {
   const activePromotions = promotions.filter((p) => p.status === "Active");
   const retailers = organizationHierarchy.filter(h => h.level === 'Retailer');
@@ -36,25 +41,35 @@ export default function ParticipationReportPage() {
     return organizationHierarchy.find(h => h.id === distributorId)?.name;
   };
 
-  const getParticipatingPromotions = (retailerId: string): Promotion[] => {
+  const getParticipatingPromotions = (retailerId: string): ParticipationInfo[] => {
     const distributorId = getRetailerParent(retailerId);
     if (!distributorId) return [];
     
     const distributorName = getDistributorName(distributorId);
 
-    const participatingPromotionIds = new Set<string>();
+    const participatingPromotionData: Record<string, { promotion: Promotion, totalValue: number }> = {};
 
     orders.forEach(order => {
         if (order.distributorName === distributorName && order.appliedPromotionId) {
             const promotion = activePromotions.find(p => p.id === order.appliedPromotionId);
             if (promotion) {
-                participatingPromotionIds.add(promotion.id);
+                if (!participatingPromotionData[promotion.id]) {
+                    participatingPromotionData[promotion.id] = { promotion, totalValue: 0 };
+                }
+                participatingPromotionData[promotion.id].totalValue += order.amount;
             }
         }
     });
 
-    return Array.from(participatingPromotionIds).map(id => promotions.find(p => p.id === id)!);
+    return Object.values(participatingPromotionData);
   };
+  
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
 
   return (
     <>
@@ -76,6 +91,7 @@ export default function ParticipationReportPage() {
                 <TableHead>Retailer</TableHead>
                 <TableHead>Distributor</TableHead>
                 <TableHead>Participating Promotions</TableHead>
+                <TableHead className="text-right">Total Order Value</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -91,10 +107,10 @@ export default function ParticipationReportPage() {
                     <TableCell>
                       {participatingPromos.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
-                          {participatingPromos.map((promo) => (
-                            <Badge key={promo.id} variant="secondary">
-                              <Link href={`/promotions/${promo.id}/edit`} className="hover:underline">
-                                {promo.schemeName}
+                          {participatingPromos.map((info) => (
+                            <Badge key={info.promotion.id} variant="secondary">
+                              <Link href={`/promotions/${info.promotion.id}/edit`} className="hover:underline">
+                                {info.promotion.schemeName}
                               </Link>
                             </Badge>
                           ))}
@@ -102,6 +118,13 @@ export default function ParticipationReportPage() {
                       ) : (
                         <span className="text-muted-foreground">No active participation</span>
                       )}
+                    </TableCell>
+                     <TableCell className="text-right">
+                        {participatingPromos.length > 0 ? (
+                            formatCurrency(participatingPromos.reduce((acc, info) => acc + info.totalValue, 0))
+                        ) : (
+                            <span className="text-muted-foreground">N/A</span>
+                        )}
                     </TableCell>
                   </TableRow>
                 );

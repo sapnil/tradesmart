@@ -9,6 +9,8 @@ import {
   SidebarInset,
   SidebarFooter,
   SidebarTrigger,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -22,6 +24,7 @@ import {
   Wallet,
   ShieldAlert,
   Users,
+  FileText,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -59,19 +62,25 @@ function Logo() {
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const navItems = [
+  const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/promotions", icon: Megaphone, label: "Promotions" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Hierarchy" },
     { href: "/rules", icon: SlidersHorizontal, label: "Rule Engine" },
-    { href: "/participation-report", icon: Users, label: "Retailer Report"},
+  ];
+
+  const aiToolsNavItems = [
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
     { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
     { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
   ];
+
+  const reportsNavItems = [
+    { href: "/participation-report", icon: Users, label: "Retailer Report"},
+  ]
 
   return (
     <SidebarProvider>
@@ -81,7 +90,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {navItems.map((item) => (
+            {mainNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild tooltip={item.label}>
                   <Link href={item.href}>
@@ -92,6 +101,36 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
+            <SidebarMenu>
+              {aiToolsNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+           <SidebarGroup>
+            <SidebarGroupLabel>Reports</SidebarGroupLabel>
+            <SidebarMenu>
+              {reportsNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <div className="group-data-[collapsible=icon]:hidden">

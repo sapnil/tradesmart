@@ -90,6 +90,7 @@ export type Promotion = {
   uplift: number;
   products: PromotionProduct[];
   hierarchyIds: string[];
+  organizationGroupIds?: string[];
   productHierarchyIds: string[];
   discountTiers?: DiscountTier[];
   bundleProducts?: BundleProduct[];

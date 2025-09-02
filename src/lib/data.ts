@@ -1,4 +1,5 @@
 
+
 import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup } from '@/types';
 
 export const salesData: SalesData[] = [
@@ -46,8 +47,8 @@ export const organizationHierarchy: OrganizationHierarchy[] = [
 ];
 
 export const organizationGroups: OrganizationGroup[] = [
-    { id: 'GROUP-1', name: 'High-Performing Distributors', memberIds: ['HIER-D1', 'HIER-D2'] },
-    { id: 'GROUP-2', name: 'New Retailers Onboarding', memberIds: ['HIER-RET1', 'HIER-RET2'] },
+    { id: 'GROUP-1', name: 'High-Performing Distributors', memberIds: ['HIER-D1', 'HIER-D3'] },
+    { id: 'GROUP-2', name: 'New Delhi Retailers', memberIds: ['HIER-RET1', 'HIER-RET2'] },
 ];
 
 
@@ -76,6 +77,7 @@ export const promotions: Promotion[] = [
     uplift: 8.5,
     products: [],
     hierarchyIds: ['HIER-S1'],
+    organizationGroupIds: ['GROUP-1'],
     productHierarchyIds: ['BRAND-1'],
     bundleProducts: [
       { productId: 'PROD-002', quantity: 1},

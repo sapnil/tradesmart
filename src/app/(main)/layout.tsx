@@ -80,6 +80,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const reportsNavItems = [
     { href: "/participation-report", icon: Users, label: "Retailer Report"},
+    { href: "/retailer-profiling", icon: FileText, label: "Retailer Profiling"},
   ]
 
   return (

@@ -30,6 +30,7 @@ import {
   Telescope,
   Cog,
   BookCopy,
+  FlaskConical,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -82,14 +83,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
     { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
     { href: "/competitor-analysis", icon: Telescope, label: "Competitor Analysis" },
-    { href: "/rule-builder", icon: Cog, label: "Dynamic Rule Builder"},
-    { href: "/dynamic-rule-simulator", icon: BookCopy, label: "Dynamic Rule Simulator"},
   ];
 
   const reportsNavItems = [
     { href: "/participation-report", icon: Users, label: "Retailer Participation Report"},
     { href: "/retailer-profiling", icon: FileText, label: "Retailer Profiling"},
-  ]
+  ];
+
+  const experimentalNavItems = [
+    { href: "/rule-builder", icon: Cog, label: "Dynamic Rule Builder"},
+    { href: "/dynamic-rule-simulator", icon: BookCopy, label: "Dynamic Rule Simulator"},
+  ];
 
   return (
     <SidebarProvider>
@@ -129,6 +133,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarGroupLabel>Reports</SidebarGroupLabel>
             <SidebarMenu>
               {reportsNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel>Experimental Features</SidebarGroupLabel>
+            <SidebarMenu>
+              {experimentalNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton asChild tooltip={item.label}>
                     <Link href={item.href}>

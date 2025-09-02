@@ -20,6 +20,7 @@ import {
   Building,
   ShoppingCart,
   Wallet,
+  ShieldAlert,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -67,6 +68,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
     { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
+    { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
   ];
 
   return (

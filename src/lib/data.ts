@@ -109,6 +109,7 @@ export const promotions: Promotion[] = [
     products: [],
     hierarchyIds: ['HIER-S1', 'HIER-S2'],
     productHierarchyIds: ['BRAND-1'],
+    discountPercentage: 10,
   },
    {
     id: 'PROMO-006',
@@ -155,6 +156,7 @@ export const promotions: Promotion[] = [
     mustBuyProducts: [
       { productId: 'PROD-005', quantity: 5 }
     ],
+    discountPercentage: 5,
   },
 ];
 

@@ -95,6 +95,7 @@ const formSchema = z.object({
   minValue: z.coerce.number().optional(),
   discountValue: z.coerce.number().optional(),
   mustBuyProducts: z.array(mustBuyProductSchema).optional(),
+  discountPercentage: z.coerce.number().optional(),
 });
 
 type PromotionFormValues = z.infer<typeof formSchema>;
@@ -123,6 +124,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       minValue: promotion?.minValue || 0,
       discountValue: promotion?.discountValue || 0,
       mustBuyProducts: promotion?.mustBuyProducts || [],
+      discountPercentage: promotion?.discountPercentage || 0,
     },
   });
 
@@ -802,6 +804,34 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                         >
                            <PlusCircle className="mr-2 h-4 w-4" /> Add Must-Buy Product
                         </Button>
+                    </CardContent>
+                </Card>
+            )}
+
+            {(selectedPromotionType === 'Discount' || selectedPromotionType === 'Forced-Buy / Must-Stock') && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Discount</CardTitle>
+                        <CardDescription>
+                            {selectedPromotionType === 'Discount' 
+                                ? "Define the percentage discount for this promotion." 
+                                : "Define the percentage discount applied when the must-buy conditions are met."}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <FormField
+                            control={form.control}
+                            name="discountPercentage"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Discount Percentage (%)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="e.g. 10" {...field} className="max-w-xs" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </CardContent>
                 </Card>
             )}

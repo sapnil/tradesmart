@@ -90,6 +90,7 @@ export type Promotion = {
   minValue?: number;
   discountValue?: number;
   mustBuyProducts?: MustBuyProduct[];
+  discountPercentage?: number;
 };
 
 export type OrderItem = {

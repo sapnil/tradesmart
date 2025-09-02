@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, PlusCircle, Trash, X } from "lucide-react";
+import { CalendarIcon, PlusCircle, Sparkles, Trash, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { promotionTypes, type Promotion } from "@/types";
 import { useRouter } from "next/navigation";
@@ -46,9 +46,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { products, organizationHierarchy, productHierarchy } from "@/lib/data";
+import { products, organizationHierarchy, productHierarchy, promotions as pastPromotions, salesData } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { predictPromotionUplift, PredictPromotionUpliftOutput } from "@/ai/flows/predict-promotion-uplift";
+import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const promotionProductSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -74,6 +77,8 @@ type PromotionFormValues = z.infer<typeof formSchema>;
 export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> }) {
   const router = useRouter();
   const { toast } = useToast();
+  const [isPredicting, setIsPredicting] = useState(false);
+  const [prediction, setPrediction] = useState<PredictPromotionUpliftOutput | null>(null);
   
   const form = useForm<PromotionFormValues>({
     resolver: zodResolver(formSchema),
@@ -94,6 +99,31 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     control: form.control,
     name: "products",
   });
+
+  const handlePredictUplift = async () => {
+    setIsPredicting(true);
+    setPrediction(null);
+    const formValues = form.getValues();
+    try {
+        const result = await predictPromotionUplift({
+            promotionJson: JSON.stringify(formValues, null, 2),
+            salesDataJson: JSON.stringify(salesData, null, 2),
+            pastPromotionsJson: JSON.stringify(pastPromotions.filter(p => p.status === 'Expired'), null, 2),
+        });
+        setPrediction(result);
+        form.setValue("uplift", parseFloat(result.predictedUplift.toFixed(2)));
+    } catch (error) {
+        console.error("Failed to predict uplift:", error);
+        toast({
+            title: "Prediction Failed",
+            description: "An error occurred while trying to predict the uplift.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsPredicting(false);
+    }
+  };
+
 
   const onSubmit = (data: PromotionFormValues) => {
     // Here you would typically call an API to save the data
@@ -459,22 +489,51 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                 </CardContent>
             </Card>
 
-            <FormField
-              control={form.control}
-              name="uplift"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Uplift (%)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g. 15.2" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    The expected or actual sales uplift from this promotion.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="uplift"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Uplift (%)</FormLabel>
+                     <div className="flex items-center gap-2">
+                        <FormControl>
+                          <Input type="number" placeholder="e.g. 15.2" {...field} className="max-w-xs" />
+                        </FormControl>
+                        <Button type="button" variant="outline" onClick={handlePredictUplift} disabled={isPredicting}>
+                            {isPredicting ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Sparkles className="mr-2 h-4 w-4" />
+                            )}
+                            Predict with AI
+                        </Button>
+                    </div>
+                    <FormDescription>
+                      The expected or actual sales uplift from this promotion. You can use AI to predict this value.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {isPredicting && (
+                  <div className="flex items-center text-sm text-muted-foreground">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      The AI is analyzing the data...
+                  </div>
               )}
-            />
+              {prediction && (
+                <Alert>
+                    <Sparkles className="h-4 w-4" />
+                    <AlertTitle>AI Uplift Prediction: {prediction.predictedUplift.toFixed(2)}%</AlertTitle>
+                    <AlertDescription className="mt-2 space-y-2">
+                        <p>{prediction.reasoning}</p>
+                        <p className="text-xs text-muted-foreground">Confidence: {prediction.confidenceScore}%</p>
+                    </AlertDescription>
+                </Alert>
+              )}
+            </div>
+
 
             <div className="flex justify-between">
               <div>
@@ -489,7 +548,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently delete the
                           promotion &quot;{promotion.schemeName}&quot;.
-                        </AlertDialogDescription>
+                        </Description>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -514,5 +573,3 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     </Card>
   );
 }
-
-    

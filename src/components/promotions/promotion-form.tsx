@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -91,7 +91,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       uplift: promotion?.uplift || 0,
       products: promotion?.products || [],
       hierarchyIds: promotion?.hierarchyIds || [],
-      productHierarchyIds: promotion?.productHierarchyIds || [],
+      productHierarchyIds: promotion?.productHierarchyIds || []
     },
   });
 
@@ -149,7 +149,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     router.push("/promotions");
   };
 
-  function handleMultiSelectChange(field: any, value: string) {
+  function handleMultiSelectChange(field: ControllerRenderProps<PromotionFormValues, "hierarchyIds" | "productHierarchyIds">, value: string) {
     const currentValues = field.value || [];
     if (currentValues.includes(value)) {
       field.onChange(currentValues.filter((v: string) => v !== value));
@@ -548,7 +548,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently delete the
                           promotion &quot;{promotion.schemeName}&quot;.
-                        </Description>
+                        </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>

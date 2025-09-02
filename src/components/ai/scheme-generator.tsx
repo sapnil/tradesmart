@@ -26,6 +26,7 @@ const formSchema = z.object({
   objective: z.string().min(10, { message: "Objective must be at least 10 characters." }),
   productCategory: z.string().min(3, { message: "Product category is required." }),
   trendAnalysis: z.string().min(10, { message: "Trend analysis is required." }),
+  distributorBehavior: z.string().optional(),
 });
 
 export function SchemeGenerator() {
@@ -39,6 +40,7 @@ export function SchemeGenerator() {
       objective: "Avoid a trade slump and increase market share by 10% in the next quarter.",
       productCategory: "Carbonated Soft Drinks",
       trendAnalysis: "Sales data shows a 15% dip in the last two months, especially in urban areas. Competitors are running aggressive summer campaigns.",
+      distributorBehavior: "Distributors tend to buy products with high discounts only, ignoring other SKUs. Some also do bulk-buying only at the end of the month to meet targets.",
     },
   });
 
@@ -104,6 +106,22 @@ export function SchemeGenerator() {
                     </FormControl>
                      <FormDescription>
                         A brief summary of current market conditions.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="distributorBehavior"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Distributor Buying Behavior</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Describe distributor buying patterns..." {...field} rows={4} />
+                    </FormControl>
+                     <FormDescription>
+                        Provide insights into distributor behavior to help prevent scheme misuse.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

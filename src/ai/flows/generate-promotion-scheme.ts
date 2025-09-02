@@ -25,6 +25,12 @@ const GeneratePromotionSchemeInputSchema = z.object({
     .describe(
       'The objective of the promotion scheme, e.g., to increase sales volume, market share, or customer engagement.'
     ),
+  distributorBehavior: z
+    .string()
+    .optional()
+    .describe(
+      'Insights into distributor buying patterns, such as bulk buying at month-end, or focusing only on discounted products. This is used to design schemes that prevent misuse.'
+    ),
 });
 export type GeneratePromotionSchemeInput = z.infer<typeof GeneratePromotionSchemeInputSchema>;
 
@@ -54,18 +60,22 @@ const prompt = ai.definePrompt({
   Trend Analysis: {{{trendAnalysis}}}
   Product Category: {{{productCategory}}}
   Objective: {{{objective}}}
+  {{#if distributorBehavior}}
+  Distributor Buying Behavior Insights: {{{distributorBehavior}}}
+  {{/if}}
 
   Consider the following factors when generating the promotion scheme:
   - Market trends
   - Competitor activities
   - Customer preferences
   - Budget constraints
+  - **Crucially, analyze the Distributor Buying Behavior to design scheme mechanics that prevent misuse.** For example, if distributors only buy promoted items, suggest a scheme that requires a mix of products. If they buy in bulk at month-end, consider a scheme with a steady, longer-term incentive.
 
   Provide the promotion scheme in the following format:
   - Scheme Name: [Scheme Name]
-  - Scheme Description: [A detailed description of the promotion scheme]
+  - Scheme Description: [A detailed description of the promotion scheme, including how it prevents misuse]
   - Target Audience: [The target audience for the promotion scheme]
-  - Promotion Mechanics: [The promotion mechanics, e.g., discounts, bundles, gifts]
+  - Promotion Mechanics: [The promotion mechanics, e.g., discounts, bundles, gifts. Be specific about how they prevent misuse]
   - Duration: [The duration of the promotion scheme]
   - Budget: [The budget for the promotion scheme]
   - Expected Results: [The expected results of the promotion scheme]

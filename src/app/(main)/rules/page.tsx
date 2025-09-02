@@ -5,7 +5,7 @@ export default function RulesPage() {
   return (
     <>
       <PageHeader
-        title="Promotion Simulator"
+        title="Promotion Impact Simulator"
         description="Simulate the impact of a promotion in a specific region or area based on historical data."
       />
       <PromotionSimulator />

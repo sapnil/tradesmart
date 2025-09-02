@@ -19,6 +19,7 @@ import {
   SlidersHorizontal,
   Building,
   ShoppingCart,
+  Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -65,6 +66,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/rules", icon: SlidersHorizontal, label: "Rule Engine" },
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
+    { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
   ];
 
   return (

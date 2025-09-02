@@ -24,7 +24,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles, Wand2 } from "lucide-react";
 import { orders, promotions, organizationHierarchy, productHierarchy } from "@/lib/data";
-import { applyPromotionRules, ApplyPromotionRulesOutput } from "@/ai/flows/apply-promotion-rules";
+import { applyPromotionRules } from "@/ai/flows/apply-promotion-rules";
+import { ApplyPromotionRulesOutput } from "@/types/promotions";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 

@@ -10,4 +10,3 @@ import '@/ai/flows/profile-retailers.ts';
 import '@/ai/flows/analyze-competitor-promotion.ts';
 import '@/ai/flows/apply-promotion-rules.ts';
 import '@/ai/flows/simulate-promotion-impact.ts';
-import '@/ai/flows/evaluate-dynamic-rule.ts';

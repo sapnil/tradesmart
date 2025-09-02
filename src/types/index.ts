@@ -6,12 +6,12 @@ export type SalesData = {
 };
 
 export const promotionTypes = [
-  'Discount', // Simple discount %
-  'Tiered Volume Discount', // Discount % based on quantity
+  'Discount',
+  'Tiered Volume Discount',
   'Quantity-Based Freebie (Buy X, Get Y)',
   'Bundle',
-  'Value-Based Discount', // Discount on minimum purchase value
-  'Forced-Buy / Must-Stock', // Discount on one product conditional on buying another
+  'Value-Based Discount',
+  'Forced-Buy / Must-Stock',
   'QPS (Long-Term Incentive)',
   'Rebate and Loyalty Programs',
   'Free Goods and Sampling Schemes',

@@ -115,7 +115,7 @@ export function PromotionSimulator() {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a region, state, or area" />
-                        </SelectTrigger>
+                        </Trigger>
                       </FormControl>
                       <SelectContent>
                         {organizationHierarchy.filter(h => h.level !== 'Retailer').map((h) => (

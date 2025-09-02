@@ -28,7 +28,6 @@ import {
   Users,
   FileText,
   Telescope,
-  Cog,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -72,8 +71,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
-    { href: "/rules", icon: SlidersHorizontal, label: "Impact Simulator" },
-    { href: "/rules-engine", icon: Cog, label: "Dynamic Rule Engine" },
+    { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
   ];
 
   const aiToolsNavItems = [

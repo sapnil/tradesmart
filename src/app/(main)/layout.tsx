@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   Wallet,
   ShieldAlert,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -65,6 +66,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Hierarchy" },
     { href: "/rules", icon: SlidersHorizontal, label: "Rule Engine" },
+    { href: "/participation-report", icon: Users, label: "Retailer Report"},
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
     { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },

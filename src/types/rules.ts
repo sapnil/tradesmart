@@ -1,5 +1,4 @@
 
-
 import { z } from 'zod';
 
 // #region -------- Condition Types --------
@@ -83,7 +82,7 @@ export type ActionType = z.infer<typeof ActionTypeSchema>;
 export const actionTypes: ActionType[] = [
     'applyPercentageDiscount',
     'applyFixedValueDiscount',
-f    'addFreeProduct',
+    'addFreeProduct',
     'setBundlePrice',
 ];
 

@@ -25,6 +25,7 @@ import {
   ShieldAlert,
   Users,
   FileText,
+  Telescope,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -76,6 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
     { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
     { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
+    { href: "/competitor-analysis", icon: Telescope, label: "Competitor Analysis" },
   ];
 
   const reportsNavItems = [

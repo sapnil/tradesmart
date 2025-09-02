@@ -1,4 +1,4 @@
-import type { Promotion, SalesData, Product, OrganizationHierarchy } from '@/types';
+import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -17,6 +17,17 @@ export const products: Product[] = [
     { id: 'PROD-003', name: 'Zesty Orange 300ml', sku: 'ZO300' },
     { id: 'PROD-004', name: 'Zesty Orange 500ml', sku: 'ZO500' },
     { id: 'PROD-005', name: 'Lemon-Lime Burst 300ml', sku: 'LLB300' },
+];
+
+export const productHierarchy: ProductHierarchy[] = [
+  { id: 'CAT-1', name: 'Beverages', level: 'Category' },
+  { id: 'BRAND-1', name: 'Cool Cola', level: 'Brand', parentId: 'CAT-1' },
+  { id: 'SKU-1', name: 'Cool Cola 300ml', level: 'SKU', parentId: 'BRAND-1' },
+  { id: 'SKU-2', name: 'Cool Cola 500ml', level: 'SKU', parentId: 'BRAND-1' },
+  { id: 'BRAND-2', name: 'Zesty Orange', level: 'Brand', parentId: 'CAT-1' },
+  { id: 'SKU-3', name: 'Zesty Orange 300ml', level: 'SKU', parentId: 'BRAND-2' },
+  { id: 'SKU-4', name: 'Zesty Orange 500ml', level: 'SKU', parentId: 'BRAND-2' },
+  { id: 'CAT-2', name: 'Snacks', level: 'Category' },
 ];
 
 export const organizationHierarchy: OrganizationHierarchy[] = [
@@ -42,7 +53,8 @@ export const promotions: Promotion[] = [
     products: [
         { productId: 'PROD-001', buyQuantity: 6, getQuantity: 1, getSKU: 'PROD-001' }
     ],
-    hierarchyIds: ['HIER-R1']
+    hierarchyIds: ['HIER-R1'],
+    productHierarchyIds: ['CAT-1'],
   },
   {
     id: 'PROMO-002',
@@ -53,7 +65,8 @@ export const promotions: Promotion[] = [
     type: 'Bundle',
     uplift: 8.5,
     products: [],
-    hierarchyIds: ['HIER-S1']
+    hierarchyIds: ['HIER-S1'],
+    productHierarchyIds: ['BRAND-1'],
   },
   {
     id: 'PROMO-003',
@@ -64,7 +77,8 @@ export const promotions: Promotion[] = [
     type: 'Contest',
     uplift: 0,
     products: [],
-    hierarchyIds: ['HIER-R1', 'HIER-R2']
+    hierarchyIds: ['HIER-R1', 'HIER-R2'],
+    productHierarchyIds: ['CAT-1', 'CAT-2'],
   },
   {
     id: 'PROMO-004',
@@ -75,7 +89,8 @@ export const promotions: Promotion[] = [
     type: 'Freebie',
     uplift: 12.5,
     products: [],
-    hierarchyIds: ['HIER-S3']
+    hierarchyIds: ['HIER-S3'],
+    productHierarchyIds: ['BRAND-2'],
   },
   {
     id: 'PROMO-005',
@@ -86,6 +101,7 @@ export const promotions: Promotion[] = [
     type: 'Discount',
     uplift: 22.1,
     products: [],
-    hierarchyIds: ['HIER-S1', 'HIER-S2']
+    hierarchyIds: ['HIER-S1', 'HIER-S2'],
+    productHierarchyIds: ['BRAND-1'],
   },
 ];

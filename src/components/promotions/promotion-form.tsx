@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +31,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, PlusCircle, Trash } from "lucide-react";
+import { CalendarIcon, PlusCircle, Trash, X } from "lucide-react";
 import { format } from "date-fns";
 import { promotionTypes, type Promotion } from "@/types";
 import { useRouter } from "next/navigation";
@@ -46,8 +47,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { products, organizationHierarchy } from "@/lib/data";
+import { products, organizationHierarchy, productHierarchy } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const promotionProductSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -65,6 +67,7 @@ const formSchema = z.object({
   uplift: z.coerce.number().optional(),
   products: z.array(promotionProductSchema),
   hierarchyIds: z.array(z.string()).min(1, "At least one hierarchy level is required."),
+  productHierarchyIds: z.array(z.string()).min(1, "At least one product hierarchy level is required."),
 });
 
 type PromotionFormValues = z.infer<typeof formSchema>;
@@ -79,12 +82,14 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     endDate: new Date(promotion.endDate),
     products: promotion.products || [],
     hierarchyIds: promotion.hierarchyIds || [],
+    productHierarchyIds: promotion.productHierarchyIds || [],
   } : {
     schemeName: "",
     status: "Upcoming" as const,
     uplift: 0,
     products: [],
     hierarchyIds: [],
+    productHierarchyIds: [],
   };
 
   const form = useForm<PromotionFormValues>({
@@ -120,6 +125,15 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     });
     router.push("/promotions");
   }
+
+  const handleMultiSelectChange = (field: any, value: string) => {
+    const currentValues = field.value || [];
+    if (currentValues.includes(value)) {
+      field.onChange(currentValues.filter((v: string) => v !== value));
+    } else {
+      field.onChange([...currentValues, value]);
+    }
+  };
 
   return (
     <Card>
@@ -277,8 +291,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Organization Hierarchy</FormLabel>
-                  {/* For simplicity, using a multi-select. A tree-view would be better for a real app. */}
-                  <Select onValueChange={(value) => field.onChange([...field.value, value])} >
+                  <Select onValueChange={(value) => handleMultiSelectChange(field, value)} >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select hierarchy levels to apply this promotion" />
@@ -286,15 +299,63 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                     </FormControl>
                     <SelectContent>
                       {organizationHierarchy.map((item) => (
-                        <SelectItem key={item.id} value={item.id} disabled={field.value?.includes(item.id)}>
+                        <SelectItem key={item.id} value={item.id}>
                           {item.name} ({item.level})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>
-                    Selected: {form.getValues('hierarchyIds').map(id => organizationHierarchy.find(h => h.id === id)?.name).join(', ')}
-                  </FormDescription>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {field.value?.map(id => {
+                        const item = organizationHierarchy.find(h => h.id === id);
+                        return item ? (
+                            <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                                {item.name}
+                                <button type="button" onClick={() => handleMultiSelectChange(field, id)} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                    <X className="h-3 w-3"/>
+                                </button>
+                            </Badge>
+                        ) : null
+                    })}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="productHierarchyIds"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Hierarchy</FormLabel>
+                   <Select onValueChange={(value) => handleMultiSelectChange(field, value)} >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select product hierarchy levels to apply this promotion" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {productHierarchy.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name} ({item.level})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {field.value?.map(id => {
+                        const item = productHierarchy.find(h => h.id === id);
+                        return item ? (
+                            <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                                {item.name}
+                                <button type="button" onClick={() => handleMultiSelectChange(field, id)} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                    <X className="h-3 w-3"/>
+                                </button>
+                            </Badge>
+                        ) : null
+                    })}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -326,7 +387,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a product to apply promotion" />
-                                                </SelectTrigger>
+                                                </Trigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {products.map((product) => (
@@ -377,7 +438,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select free product" />
-                                                </SelectTrigger>
+                                                </Trigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {products.map((product) => (

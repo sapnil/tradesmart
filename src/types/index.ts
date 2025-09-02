@@ -31,6 +31,13 @@ export type Product = {
     sku: string;
 };
 
+export type ProductHierarchy = {
+  id: string;
+  name: string;
+  level: 'Category' | 'Brand' | 'SKU';
+  parentId?: string;
+};
+
 export type PromotionProduct = {
     productId: string;
     buyQuantity: number;
@@ -55,4 +62,5 @@ export type Promotion = {
   uplift: number;
   products: PromotionProduct[];
   hierarchyIds: string[];
+  productHierarchyIds: string[];
 };

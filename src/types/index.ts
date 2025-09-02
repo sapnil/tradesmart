@@ -46,7 +46,7 @@ export type PromotionProduct = {
     productId: string;
     buyQuantity: number;
     getQuantity: number;
-    getSKU: string;
+    getProductId: string;
 }
 
 export type BundleProduct = {

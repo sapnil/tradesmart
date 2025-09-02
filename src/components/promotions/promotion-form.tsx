@@ -59,7 +59,7 @@ const promotionProductSchema = z.object({
   productId: z.string().min(1, "Product is required."),
   buyQuantity: z.coerce.number().min(1, "Buy quantity must be at least 1."),
   getQuantity: z.coerce.number().min(1, "Get quantity must be at least 1."),
-  getSKU: z.string().min(1, "Get SKU is required."),
+  getProductId: z.string().min(1, "Get SKU is required."),
 });
 
 const discountTierSchema = z.object({
@@ -115,7 +115,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       startDate: promotion?.startDate ? new Date(promotion.startDate) : new Date(),
       endDate: promotion?.endDate ? new Date(promotion.endDate) : new Date(new Date().setDate(new Date().getDate() + 30)),
       uplift: promotion?.uplift || 0,
-      products: promotion?.products || [],
+      products: promotion?.products?.map(p => ({...p, getProductId: p.getProductId || (p as any).getSKU})) || [],
       discountTiers: promotion?.discountTiers || [],
       bundleProducts: promotion?.bundleProducts || [],
       bundlePrice: promotion?.bundlePrice || 0,
@@ -505,7 +505,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                                 />
                                 <FormField
                                     control={form.control}
-                                    name={`products.${index}.getSKU`}
+                                    name={`products.${index}.getProductId`}
                                     render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Get Product (Free)</FormLabel>
@@ -534,7 +534,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => appendProduct({ productId: '', buyQuantity: 1, getQuantity: 1, getSKU: '' })}
+                        onClick={() => appendProduct({ productId: '', buyQuantity: 1, getQuantity: 1, getProductId: '' })}
                     >
                        <PlusCircle className="mr-2 h-4 w-4" /> Add Product Rule
                     </Button>

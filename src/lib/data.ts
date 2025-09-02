@@ -52,7 +52,7 @@ export const promotions: Promotion[] = [
     type: 'Quantity Price Schemes (QPS)',
     uplift: 15.2,
     products: [
-        { productId: 'PROD-001', buyQuantity: 6, getQuantity: 1, getSKU: 'PROD-001' }
+        { productId: 'PROD-001', buyQuantity: 6, getQuantity: 1, getProductId: 'PROD-001' }
     ],
     hierarchyIds: ['HIER-R1'],
     productHierarchyIds: ['CAT-1'],

@@ -124,14 +124,14 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     router.push("/promotions");
   };
 
-  const handleMultiSelectChange = (field: any, value: string) => {
+  function handleMultiSelectChange(field: any, value: string) {
     const currentValues = field.value || [];
     if (currentValues.includes(value)) {
       field.onChange(currentValues.filter((v: string) => v !== value));
     } else {
       field.onChange([...currentValues, value]);
     }
-  };
+  }
 
   return (
     <Card>

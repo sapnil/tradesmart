@@ -175,7 +175,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
 
   const updateCondition = (index: number, newConfig: Condition['config']) => {
     const newConditions = [...rule.conditions];
-    newConditions[index].config = newConfig as any;
+    newConditions[index] = { ...newConditions[index], config: newConfig as any };
     onRuleChange({ ...rule, conditions: newConditions });
   };
   
@@ -194,8 +194,93 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
 
   const updateAction = (index: number, newConfig: Action['config']) => {
     const newActions = [...rule.actions];
-    newActions[index].config = newConfig as any;
+    newActions[index] = { ...newActions[index], config: newConfig as any };
     onRuleChange({ ...rule, actions: newActions });
+  };
+
+  const handleDragEnd = (
+    event: DragEndEvent,
+    type: 'conditions' | 'actions'
+  ) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = rule[type].findIndex((item, i) => `${type}-${i}` === active.id);
+      const newIndex = rule[type].findIndex((item, i) => `${type}-${i}` === over.id);
+
+      onRuleChange({
+        ...rule,
+        [type]: arrayMove(rule[type], oldIndex, newIndex),
+      });
+    }
+  };
+
+  const addCondition = (type: Condition['type']) => {
+    let newCondition: Condition;
+    switch (type) {
+      case 'DATE_RANGE':
+        newCondition = {
+          type,
+          config: { startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] },
+        };
+        break;
+      case 'CUSTOMER_HIERARCHY':
+        newCondition = { type, config: { hierarchyIds: [] } };
+        break;
+      case 'PRODUCT_HIERARCHY':
+        newCondition = { type, config: { productHierarchyIds: [] } };
+        break;
+      case 'PRODUCT_PURCHASE':
+        newCondition = { type, config: { productId: '', quantity: 1 } };
+        break;
+      case 'TOTAL_ORDER_VALUE':
+        newCondition = { type, config: { minValue: 0 } };
+        break;
+      case 'TOTAL_ORDER_QUANTITY':
+        newCondition = { type, config: { productHierarchyIds: [], minQuantity: 1 } };
+        break;
+      default:
+        throw new Error("Invalid condition type");
+    }
+    onRuleChange({
+      ...rule,
+      conditions: [...rule.conditions, newCondition],
+    });
+  };
+
+  const addAction = (type: Action['type']) => {
+    let newAction: Action;
+    switch (type) {
+      case 'PERCENTAGE_DISCOUNT':
+        newAction = { type, config: { discountPercentage: 10, applicableProductHierarchyIds: [] } };
+        break;
+      case 'FIXED_VALUE_DISCOUNT':
+        newAction = { type, config: { discountValue: 100 } };
+        break;
+      case 'FREE_PRODUCT':
+        newAction = { type, config: { productId: '', quantity: 1 } };
+        break;
+      case 'BUNDLE_PRICE':
+        newAction = { type, config: { bundlePrice: 100 } };
+        break;
+      default:
+        throw new Error("Invalid action type");
+    }
+    onRuleChange({ ...rule, actions: [...rule.actions, newAction] });
+  };
+
+  const removeCondition = (index: number) => {
+    onRuleChange({
+      ...rule,
+      conditions: rule.conditions.filter((_, i) => i !== index),
+    });
+  };
+
+  const removeAction = (index: number) => {
+    onRuleChange({
+      ...rule,
+      actions: rule.actions.filter((_, i) => i !== index),
+    });
   };
 
   const renderConditionContent = (condition: Condition, index: number) => {
@@ -277,7 +362,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                     </div>
                     <div>
                         <Label>Minimum Quantity</Label>
-                        <Input type='number' value={condition.config.quantity} onChange={e => updateCondition(index, {...condition.config, quantity: parseInt(e.target.value) || 0})} />
+                        <Input type='number' value={condition.config.quantity} onChange={e => updateCondition(index, {...condition.config, quantity: parseInt(e.target.value, 10) || 0})} />
                     </div>
                 </div>
             )
@@ -285,14 +370,14 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
              return (
                 <div>
                     <Label>Minimum Value</Label>
-                    <Input type='number' value={condition.config.minValue} onChange={e => updateCondition(index, {...condition.config, minValue: parseInt(e.target.value) || 0})} />
+                    <Input type='number' value={condition.config.minValue} onChange={e => updateCondition(index, {...condition.config, minValue: parseInt(e.target.value, 10) || 0})} />
                 </div>
              )
         case 'TOTAL_ORDER_QUANTITY':
             return (
                  <div>
                     <Label>Minimum Quantity</Label>
-                    <Input type='number' value={condition.config.minQuantity} onChange={e => updateCondition(index, {...condition.config, minQuantity: parseInt(e.target.value) || 0})} />
+                    <Input type='number' value={condition.config.minQuantity} onChange={e => updateCondition(index, {...condition.config, minQuantity: parseInt(e.target.value, 10) || 0})} />
                 </div>
             )
         default:
@@ -306,14 +391,14 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
             return (
                 <div>
                     <Label>Discount Percentage</Label>
-                    <Input type='number' value={action.config.discountPercentage} onChange={e => updateAction(index, { ...action.config, discountPercentage: parseInt(e.target.value) || 0 })} />
+                    <Input type='number' value={action.config.discountPercentage} onChange={e => updateAction(index, { ...action.config, discountPercentage: parseInt(e.target.value, 10) || 0 })} />
                 </div>
             )
         case 'FIXED_VALUE_DISCOUNT':
             return (
                 <div>
                     <Label>Discount Amount</Label>
-                    <Input type='number' value={action.config.discountValue} onChange={e => updateAction(index, { discountValue: parseInt(e.target.value) || 0 })} />
+                    <Input type='number' value={action.config.discountValue} onChange={e => updateAction(index, { discountValue: parseInt(e.target.value, 10) || 0 })} />
                 </div>
             )
         case 'FREE_PRODUCT':
@@ -330,7 +415,7 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
                     </div>
                     <div>
                         <Label>Quantity</Label>
-                        <Input type='number' value={action.config.quantity} onChange={e => updateAction(index, {...action.config, quantity: parseInt(e.target.value) || 0})} />
+                        <Input type='number' value={action.config.quantity} onChange={e => updateAction(index, {...action.config, quantity: parseInt(e.target.value, 10) || 0})} />
                     </div>
                 </div>
             )
@@ -338,95 +423,13 @@ export function RuleBuilder({ rule, onRuleChange }: RuleBuilderProps) {
             return (
                 <div>
                     <Label>Bundle Price</Label>
-                    <Input type='number' value={action.config.bundlePrice} onChange={e => updateAction(index, { bundlePrice: parseInt(e.target.value) || 0 })} />
+                    <Input type='number' value={action.config.bundlePrice} onChange={e => updateAction(index, { bundlePrice: parseInt(e.target.value, 10) || 0 })} />
                 </div>
             )
         default:
             return null
     }
   }
-
-
-  const handleDragEnd = (
-    event: DragEndEvent,
-    type: 'conditions' | 'actions'
-  ) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = rule[type].findIndex((item, i) => `${type}-${i}` === active.id);
-      const newIndex = rule[type].findIndex((item, i) => `${type}-${i}` === over.id);
-
-      onRuleChange({
-        ...rule,
-        [type]: arrayMove(rule[type], oldIndex, newIndex),
-      });
-    }
-  };
-
-  const addCondition = (type: Condition['type']) => {
-    let newCondition: Condition;
-    switch (type) {
-      case 'DATE_RANGE':
-        newCondition = {
-          type,
-          config: { startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] },
-        };
-        break;
-      case 'CUSTOMER_HIERARCHY':
-        newCondition = { type, config: { hierarchyIds: [] } };
-        break;
-      case 'PRODUCT_HIERARCHY':
-        newCondition = { type, config: { productHierarchyIds: [] } };
-        break;
-      case 'PRODUCT_PURCHASE':
-        newCondition = { type, config: { productId: '', quantity: 1 } };
-        break;
-      case 'TOTAL_ORDER_VALUE':
-        newCondition = { type, config: { minValue: 0 } };
-        break;
-      case 'TOTAL_ORDER_QUANTITY':
-        newCondition = { type, config: { productHierarchyIds: [], minQuantity: 1 } };
-        break;
-    }
-    onRuleChange({
-      ...rule,
-      conditions: [...rule.conditions, newCondition],
-    });
-  };
-
-  const addAction = (type: Action['type']) => {
-    let newAction: Action;
-    switch (type) {
-      case 'PERCENTAGE_DISCOUNT':
-        newAction = { type, config: { discountPercentage: 10, applicableProductHierarchyIds: [] } };
-        break;
-      case 'FIXED_VALUE_DISCOUNT':
-        newAction = { type, config: { discountValue: 100 } };
-        break;
-      case 'FREE_PRODUCT':
-        newAction = { type, config: { productId: '', quantity: 1 } };
-        break;
-      case 'BUNDLE_PRICE':
-        newAction = { type, config: { bundlePrice: 100 } };
-        break;
-    }
-    onRuleChange({ ...rule, actions: [...rule.actions, newAction] });
-  };
-
-  const removeCondition = (index: number) => {
-    onRuleChange({
-      ...rule,
-      conditions: rule.conditions.filter((_, i) => i !== index),
-    });
-  };
-
-  const removeAction = (index: number) => {
-    onRuleChange({
-      ...rule,
-      actions: rule.actions.filter((_, i) => i !== index),
-    });
-  };
 
   const renderCondition = (condition: Condition, index: number) => {
     const meta = conditionMetadata[condition.type];

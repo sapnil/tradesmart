@@ -1,3 +1,4 @@
+
 "use client"
 
 import {
@@ -15,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import {
   Bar,
   BarChart,
@@ -25,10 +25,11 @@ import {
   Tooltip,
 } from "recharts"
 import { PageHeader } from "@/components/page-header"
-import { promotions, salesData } from "@/lib/data"
-import { ArrowUpRight, DollarSign, Megaphone, Percent } from "lucide-react"
+import { promotions, salesData, orders } from "@/lib/data"
+import { ArrowUpRight, DollarSign, Megaphone, Percent, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import type { Promotion } from "@/types"
 
 const kpiData = [
     { title: "Active Promotions", value: "3", change: "+2 from last month", icon: Megaphone },
@@ -37,6 +38,17 @@ const kpiData = [
 ]
 
 export default function DashboardPage() {
+  const activePromotions = promotions.filter(p => p.status === 'Active');
+
+  const promotionEffectiveness = activePromotions.map(promo => {
+    const appliedCount = orders.filter(order => order.appliedPromotionId === promo.id).length;
+    return {
+      ...promo,
+      appliedCount,
+    }
+  }).sort((a, b) => b.appliedCount - a.appliedCount);
+
+
   return (
     <>
       <PageHeader title="Dashboard" description="Welcome back, here's a summary of your trade promotions." />
@@ -91,9 +103,9 @@ export default function DashboardPage() {
         <Card className="lg:col-span-3">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
-              <CardTitle>Recent Promotions</CardTitle>
+              <CardTitle>Scheme Effectiveness</CardTitle>
               <CardDescription>
-                An overview of the most recent trade promotions.
+                Performance of active promotion schemes.
               </CardDescription>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
@@ -108,25 +120,33 @@ export default function DashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Scheme</TableHead>
-                  <TableHead className="text-right">Status</TableHead>
+                  <TableHead className="text-right">Applied Orders</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {promotions.slice(0, 5).map((promo) => (
-                  <TableRow key={promo.id}>
-                    <TableCell>
-                      <div className="font-medium">{promo.schemeName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {promo.type}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                       <Badge variant={promo.status === 'Active' ? 'default' : promo.status === 'Upcoming' ? 'secondary' : 'outline'} className={promo.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/20' : ''}>
-                        {promo.status}
-                      </Badge>
+                {promotionEffectiveness.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center text-muted-foreground">
+                      No active promotions applied yet.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  promotionEffectiveness.map((promo) => (
+                    <TableRow key={promo.id}>
+                      <TableCell>
+                        <Link href={`/promotions/${promo.id}/edit`} className="font-medium hover:underline text-primary">
+                          {promo.schemeName}
+                        </Link>
+                        <div className="text-sm text-muted-foreground hidden md:block">
+                          {promo.type}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="font-bold text-lg">{promo.appliedCount}</div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>

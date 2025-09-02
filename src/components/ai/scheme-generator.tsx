@@ -18,7 +18,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Sparkles, Bot } from "lucide-react";
+import { Loader2, Sparkles, Bot, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Separator } from "../ui/separator";
 
 const formSchema = z.object({
   objective: z.string().min(10, { message: "Objective must be at least 10 characters." }),
@@ -137,36 +139,50 @@ export function SchemeGenerator() {
             {loading && <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}
             {error && <p className="text-destructive">{error}</p>}
             {result ? (
-              <div className="space-y-4 text-sm">
-                <h3 className="font-bold text-lg text-primary">{result.schemeName}</h3>
-                <div>
-                    <h4 className="font-semibold">Description</h4>
-                    <p className="text-muted-foreground">{result.schemeDescription}</p>
+              <div className="flex flex-col h-full">
+                <div className="space-y-4 text-sm flex-grow">
+                  <h3 className="font-bold text-lg text-primary">{result.schemeName}</h3>
+                  <div>
+                      <h4 className="font-semibold">Description</h4>
+                      <p className="text-muted-foreground">{result.schemeDescription}</p>
+                  </div>
+                  <div>
+                      <h4 className="font-semibold">Target Audience</h4>
+                      <p className="text-muted-foreground">{result.targetAudience}</p>
+                  </div>
+                  <div>
+                      <h4 className="font-semibold">Mechanics</h4>
+                      <ul className="list-disc list-inside text-muted-foreground">
+                          {result.promotionMechanics.map((mech, i) => <li key={i}>{mech}</li>)}
+                      </ul>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                      <div>
+                          <h4 className="font-semibold">Duration</h4>
+                          <p className="text-muted-foreground">{result.duration}</p>
+                      </div>
+                      <div>
+                          <h4 className="font-semibold">Budget</h4>
+                          <p className="text-muted-foreground">{result.budget}</p>
+                      </div>
+                  </div>
+                  <div>
+                      <h4 className="font-semibold">Expected Results</h4>
+                      <p className="text-muted-foreground">{result.expectedResults}</p>
+                  </div>
                 </div>
-                 <div>
-                    <h4 className="font-semibold">Target Audience</h4>
-                    <p className="text-muted-foreground">{result.targetAudience}</p>
-                </div>
-                <div>
-                    <h4 className="font-semibold">Mechanics</h4>
-                    <ul className="list-disc list-inside text-muted-foreground">
-                        {result.promotionMechanics.map((mech, i) => <li key={i}>{mech}</li>)}
-                    </ul>
-                </div>
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                    <div>
-                        <h4 className="font-semibold">Duration</h4>
-                        <p className="text-muted-foreground">{result.duration}</p>
-                    </div>
-                     <div>
-                        <h4 className="font-semibold">Budget</h4>
-                        <p className="text-muted-foreground">{result.budget}</p>
-                    </div>
-                </div>
-                 <div>
-                    <h4 className="font-semibold">Expected Results</h4>
-                    <p className="text-muted-foreground">{result.expectedResults}</p>
-                </div>
+                <Separator className="my-4" />
+                <Button asChild>
+                  <Link href={{
+                      pathname: '/promotions/create',
+                      query: {
+                          schemeName: result.schemeName,
+                      }
+                  }}>
+                      Create Promotion from this Scheme
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
               </div>
             ) : !loading && <div className="text-center text-muted-foreground p-8">Your generated scheme will be displayed here.</div>}
           </CardContent>

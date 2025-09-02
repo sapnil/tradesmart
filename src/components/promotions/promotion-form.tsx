@@ -71,7 +71,7 @@ const formSchema = z.object({
 
 type PromotionFormValues = z.infer<typeof formSchema>;
 
-export function PromotionForm({ promotion }: { promotion?: Promotion }) {
+export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> }) {
   const router = useRouter();
   const { toast } = useToast();
   
@@ -99,8 +99,8 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     // Here you would typically call an API to save the data
     console.log("Form submitted", data);
     toast({
-      title: `Promotion ${promotion ? 'updated' : 'created'}`,
-      description: `The promotion "${data.schemeName}" has been successfully ${promotion ? 'updated' : 'created'}.`,
+      title: `Promotion ${promotion?.id ? 'updated' : 'created'}`,
+      description: `The promotion "${data.schemeName}" has been successfully ${promotion?.id ? 'updated' : 'created'}.`,
     });
     router.push("/promotions");
     // In a real app, you might want to revalidate the data
@@ -131,7 +131,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{promotion ? "Edit" : "Create"} Promotion</CardTitle>
+        <CardTitle>{promotion?.id ? "Edit" : "Create"} Promotion</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -478,7 +478,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
 
             <div className="flex justify-between">
               <div>
-                {promotion && (
+                {promotion?.id && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive">Delete Promotion</Button>
@@ -505,7 +505,7 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                  <Button type="button" variant="outline" onClick={() => router.push('/promotions')}>
                     Cancel
                 </Button>
-                <Button type="submit">{promotion ? "Update" : "Create"} Promotion</Button>
+                <Button type="submit">{promotion?.id ? "Update" : "Create"} Promotion</Button>
               </div>
             </div>
           </form>

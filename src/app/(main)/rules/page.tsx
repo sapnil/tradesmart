@@ -1,14 +1,14 @@
 import { PageHeader } from "@/components/page-header";
-import { RuleSimulator } from "@/components/rules/rule-simulator";
+import { PromotionSimulator } from "@/components/rules/promotion-simulator";
 
 export default function RulesPage() {
   return (
     <>
       <PageHeader
-        title="Rule Engine Simulator"
-        description="Simulate how the rule engine applies promotions to incoming orders."
+        title="Promotion Simulator"
+        description="Simulate the impact of a promotion in a specific region or area based on historical data."
       />
-      <RuleSimulator />
+      <PromotionSimulator />
     </>
   );
 }

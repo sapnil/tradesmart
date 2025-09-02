@@ -69,7 +69,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Hierarchy" },
-    { href: "/rules", icon: SlidersHorizontal, label: "Rule Engine" },
+    { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
   ];
 
   const aiToolsNavItems = [

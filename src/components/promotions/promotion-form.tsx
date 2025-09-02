@@ -54,6 +54,7 @@ import { predictPromotionUplift } from "@/ai/flows/predict-promotion-uplift";
 import { PredictPromotionUpliftOutput } from "@/types/promotions";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from "../ui/textarea";
 
 const promotionProductSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -96,6 +97,9 @@ const formSchema = z.object({
   discountValue: z.coerce.number().optional(),
   mustBuyProducts: z.array(mustBuyProductSchema).optional(),
   discountPercentage: z.coerce.number().optional(),
+  qpsTargetQuantity: z.coerce.number().optional(),
+  qpsDurationMonths: z.coerce.number().optional(),
+  qpsReward: z.string().optional(),
 });
 
 type PromotionFormValues = z.infer<typeof formSchema>;
@@ -115,7 +119,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       startDate: promotion?.startDate ? new Date(promotion.startDate) : new Date(),
       endDate: promotion?.endDate ? new Date(promotion.endDate) : new Date(new Date().setDate(new Date().getDate() + 30)),
       uplift: promotion?.uplift || 0,
-      products: promotion?.products?.map(p => ({...p, getProductId: p.getProductId || (p as any).getSKU})) || [],
+      products: promotion?.products?.map(p => ({...p, getProductId: p.getProductId || ''})) || [],
       discountTiers: promotion?.discountTiers || [],
       bundleProducts: promotion?.bundleProducts || [],
       bundlePrice: promotion?.bundlePrice || 0,
@@ -125,6 +129,9 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       discountValue: promotion?.discountValue || 0,
       mustBuyProducts: promotion?.mustBuyProducts || [],
       discountPercentage: promotion?.discountPercentage || 0,
+      qpsTargetQuantity: promotion?.qpsTargetQuantity || 0,
+      qpsDurationMonths: promotion?.qpsDurationMonths || 0,
+      qpsReward: promotion?.qpsReward || "",
     },
   });
 
@@ -829,6 +836,61 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                                     <FormControl>
                                         <Input type="number" placeholder="e.g. 10" {...field} className="max-w-xs" />
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                </Card>
+            )}
+
+            {selectedPromotionType === 'QPS (Long-Term Incentive)' && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>QPS (Long-Term Incentive) Rules</CardTitle>
+                        <CardDescription>Define the long-term sales target and reward for distributors.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                           <FormField
+                                control={form.control}
+                                name="qpsTargetQuantity"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Target Quantity</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="e.g. 10000" {...field} />
+                                        </FormControl>
+                                        <FormDescription>Total quantity of targeted products to be sold.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="qpsDurationMonths"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Duration (Months)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="e.g. 3" {...field} />
+                                        </FormControl>
+                                        <FormDescription>How many months the distributor has to meet the target.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                         <FormField
+                            control={form.control}
+                            name="qpsReward"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Reward</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="e.g. Bike or Paris Tour for 2" {...field} />
+                                    </FormControl>
+                                    <FormDescription>Describe the prize for achieving the target.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}

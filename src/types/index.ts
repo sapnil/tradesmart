@@ -12,6 +12,7 @@ export const promotionTypes = [
   'Bundle',
   'Value-Based Discount', // Discount on minimum purchase value
   'Forced-Buy / Must-Stock', // Discount on one product conditional on buying another
+  'QPS (Long-Term Incentive)',
   'Rebate and Loyalty Programs',
   'Free Goods and Sampling Schemes',
   'Channel-Specific Schemes',
@@ -91,6 +92,9 @@ export type Promotion = {
   discountValue?: number;
   mustBuyProducts?: MustBuyProduct[];
   discountPercentage?: number;
+  qpsTargetQuantity?: number;
+  qpsDurationMonths?: number;
+  qpsReward?: string;
 };
 
 export type OrderItem = {

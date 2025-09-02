@@ -158,6 +158,21 @@ export const promotions: Promotion[] = [
     ],
     discountPercentage: 5,
   },
+   {
+    id: 'PROMO-009',
+    schemeName: 'Q3 Sales Champion',
+    status: 'Active',
+    startDate: '2024-07-01',
+    endDate: '2024-09-30',
+    type: 'QPS (Long-Term Incentive)',
+    uplift: 0,
+    products: [],
+    hierarchyIds: ['HIER-D1'],
+    productHierarchyIds: ['BRAND-1'],
+    qpsTargetQuantity: 5000,
+    qpsDurationMonths: 3,
+    qpsReward: 'All-expenses-paid trip to Paris for 2',
+  },
 ];
 
 export const orders: Order[] = [

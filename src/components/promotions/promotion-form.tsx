@@ -49,7 +49,8 @@ import {
 import { products, organizationHierarchy, productHierarchy, promotions as pastPromotions, salesData } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { predictPromotionUplift, PredictPromotionUpliftOutput } from "@/ai/flows/predict-promotion-uplift";
+import { predictPromotionUplift } from "@/ai/flows/predict-promotion-uplift";
+import { PredictPromotionUpliftOutput } from "@/types/promotions";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 

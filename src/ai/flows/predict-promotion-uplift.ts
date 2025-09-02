@@ -4,50 +4,15 @@
  * @fileOverview An AI agent that predicts the sales uplift for a new promotion.
  *
  * - predictPromotionUplift - A function that predicts the uplift.
- * - PredictPromotionUpliftInput - The input type for the function.
- * - PredictPromotionUpliftOutput - The return type for the function.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-
-export const PredictPromotionUpliftInputSchema = z.object({
-  promotionJson: z
-    .string()
-    .describe(
-      'The promotion being created, as a JSON string. This includes its type, duration, products, and hierarchy targets.'
-    ),
-  salesDataJson: z
-    .string()
-    .describe('Historical sales data as a JSON string.'),
-  pastPromotionsJson: z
-    .string()
-    .describe(
-      'Performance data from past promotions as a JSON string, including their uplift.'
-    ),
-});
-export type PredictPromotionUpliftInput = z.infer<
-  typeof PredictPromotionUpliftInputSchema
->;
-
-export const PredictPromotionUpliftOutputSchema = z.object({
-  predictedUplift: z
-    .number()
-    .describe('The predicted sales uplift percentage for the promotion.'),
-  reasoning: z
-    .string()
-    .describe(
-      'A detailed explanation of the factors that contributed to the predicted uplift, such as seasonality, promotion type, and comparison with past promotions.'
-    ),
-  confidenceScore: z
-    .number()
-    .min(0)
-    .max(100)
-    .describe('A confidence score (0-100) for the prediction.'),
-});
-export type PredictPromotionUpliftOutput = z.infer<
-  typeof PredictPromotionUpliftOutputSchema
->;
+import {
+  PredictPromotionUpliftInput,
+  PredictPromotionUpliftInputSchema,
+  PredictPromotionUpliftOutput,
+  PredictPromotionUpliftOutputSchema,
+} from '@/types/promotions';
 
 export async function predictPromotionUplift(
   input: PredictPromotionUpliftInput

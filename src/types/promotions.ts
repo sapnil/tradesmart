@@ -75,3 +75,53 @@ export const PredictPromotionUpliftOutputSchema = z.object({
 export type PredictPromotionUpliftOutput = z.infer<
   typeof PredictPromotionUpliftOutputSchema
 >;
+
+export const SimulatePromotionImpactInputSchema = z.object({
+  promotionId: z.string().describe('The ID of the promotion to simulate.'),
+  hierarchyId: z
+    .string()
+    .describe(
+      'The ID of the organization hierarchy node (e.g., Region, State) to run the simulation on.'
+    ),
+  promotionsJson: z
+    .string()
+    .describe('A JSON string of all available promotions.'),
+  historicalSalesJson: z
+    .string()
+    .describe(
+      'Historical sales data for the entire organization as a JSON string.'
+    ),
+  ordersJson: z.string().describe('A JSON string of all past orders.'),
+  organizationHierarchyJson: z
+    .string()
+    .describe('The organizational hierarchy as a JSON string.'),
+});
+export type SimulatePromotionImpactInput = z.infer<
+  typeof SimulatePromotionImpactInputSchema
+>;
+
+export const SimulatePromotionImpactOutputSchema = z.object({
+  predictedUplift: z
+    .number()
+    .describe(
+      'The predicted sales uplift percentage specifically for the selected hierarchy.'
+    ),
+  estimatedFinancialImpact: z
+    .number()
+    .describe(
+      'The estimated additional revenue generated within the selected hierarchy due to the promotion.'
+    ),
+  participatingDistributors: z
+    .array(z.string())
+    .describe(
+      'A list of distributor names within the selected hierarchy who are likely to participate.'
+    ),
+  reasoning: z
+    .string()
+    .describe(
+      'A detailed explanation for the prediction, referencing historical data, promotion type, and buying patterns in the selected area.'
+    ),
+});
+export type SimulatePromotionImpactOutput = z.infer<
+  typeof SimulatePromotionImpactOutputSchema
+>;

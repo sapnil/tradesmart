@@ -25,7 +25,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles, Wand2, Users, Percent, DollarSign } from "lucide-react";
 import { orders, promotions, organizationHierarchy, salesData } from "@/lib/data";
-import { simulatePromotionImpact, SimulatePromotionImpactOutput } from "@/ai/flows/simulate-promotion-impact";
+import { simulatePromotionImpact } from "@/ai/flows/simulate-promotion-impact";
+import { SimulatePromotionImpactOutput } from "@/types/promotions";
 
 const formSchema = z.object({
   promotionId: z.string().min(1, { message: "Please select a promotion." }),

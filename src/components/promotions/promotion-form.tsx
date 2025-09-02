@@ -59,7 +59,7 @@ const promotionProductSchema = z.object({
   productId: z.string().min(1, "Product is required."),
   buyQuantity: z.coerce.number().min(1, "Buy quantity must be at least 1."),
   getQuantity: z.coerce.number().min(1, "Get quantity must be at least 1."),
-  getProductId: z.string().min(1, "Get SKU is required."),
+  getProductId: z.string().min(1, "Get product is required."),
 });
 
 const discountTierSchema = z.object({
@@ -435,10 +435,11 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
               )}
             />
             
-            {selectedPromotionType === 'Quantity Price Schemes (QPS)' && (
+            {selectedPromotionType === 'Quantity-Based Freebie (Buy X, Get Y)' && (
             <Card>
                 <CardHeader>
-                    <CardTitle>Products & Offers (QPS)</CardTitle>
+                    <CardTitle>Products & Offers</CardTitle>
+                    <CardDescription>Define the "Buy X, Get Y" rules for this promotion.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {productFields.map((field, index) => (

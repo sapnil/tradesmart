@@ -8,7 +8,7 @@ export type SalesData = {
 export const promotionTypes = [
   'Discount', // Simple discount %
   'Tiered Volume Discount', // Discount % based on quantity
-  'Quantity Price Schemes (QPS)', // Buy X Get Y
+  'Quantity-Based Freebie (Buy X, Get Y)',
   'Bundle',
   'Value-Based Discount', // Discount on minimum purchase value
   'Forced-Buy / Must-Stock', // Discount on one product conditional on buying another

@@ -49,7 +49,7 @@ export const promotions: Promotion[] = [
     status: 'Active',
     startDate: '2024-07-01',
     endDate: '2024-08-31',
-    type: 'Quantity Price Schemes (QPS)',
+    type: 'Quantity-Based Freebie (Buy X, Get Y)',
     uplift: 15.2,
     products: [
         { productId: 'PROD-001', buyQuantity: 6, getQuantity: 1, getProductId: 'PROD-001' }

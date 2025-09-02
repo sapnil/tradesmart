@@ -75,29 +75,24 @@ type PromotionFormValues = z.infer<typeof formSchema>;
 export function PromotionForm({ promotion }: { promotion?: Promotion }) {
   const router = useRouter();
   const { toast } = useToast();
-
-  const defaultValues: PromotionFormValues = promotion ? {
-    ...promotion,
-    startDate: new Date(promotion.startDate),
-    endDate: new Date(promotion.endDate),
-    products: promotion.products || [],
-    hierarchyIds: promotion.hierarchyIds || [],
-    productHierarchyIds: promotion.productHierarchyIds || [],
-  } : {
-    schemeName: "",
-    type: "Discount",
-    status: "Upcoming",
-    startDate: new Date(),
-    endDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-    uplift: 0,
-    products: [],
-    hierarchyIds: [],
-    productHierarchyIds: [],
-  };
-
+  
   const form = useForm<PromotionFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: promotion ? {
+        ...promotion,
+        startDate: new Date(promotion.startDate),
+        endDate: new Date(promotion.endDate),
+    } : {
+        schemeName: "",
+        type: "Discount",
+        status: "Upcoming",
+        startDate: new Date(),
+        endDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+        uplift: 0,
+        products: [],
+        hierarchyIds: [],
+        productHierarchyIds: [],
+    },
   });
 
   const { fields, append, remove } = useFieldArray({

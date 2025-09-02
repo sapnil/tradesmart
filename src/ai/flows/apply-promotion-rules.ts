@@ -42,10 +42,13 @@ const prompt = ai.definePrompt({
   {{{promotionsJson}}}
 
   Follow these steps carefully:
-  1. For EACH promotion, check if the order satisfies ALL its conditions (hierarchy, products, quantities, dates).
+  1. For EACH promotion, check if the order satisfies ALL its conditions (hierarchy, products, quantities, dates, type).
   2. The promotion's 'hierarchyIds' must contain a hierarchy element that the order's distributor belongs to. Use the organization hierarchy to trace parentage.
   3. The promotion's 'productHierarchyIds' must contain a product hierarchy element that at least one item in the order belongs to. Use the product hierarchy to trace parentage.
-  4. If a promotion has specific product rules ('products' array), the order must satisfy those rules (e.g., buy X quantity of Product A to get Y quantity of Product B).
+  4. **Handle different promotion types**:
+     - If the promotion type is **'Quantity Price Schemes (QPS)'**, check if the order satisfies the specific product rules in the 'products' array (e.g., buy X quantity of Product A to get Y quantity of Product B).
+     - If the promotion type is **'Tiered Volume Discount'**, calculate the total quantity of all items in the order that belong to the promotion's 'productHierarchyIds'. Then, check this total quantity against the 'discountTiers' to see if it qualifies for any tier.
+     - For other types like **'Discount'**, simply check if the hierarchies match.
   5. If multiple promotions are applicable, choose the one that offers the best value or is most specific. If no promotions are applicable, state that clearly.
   6. Provide a 'bestPromotionId' which should be the ID of the selected promotion, or null if none apply.
   7. In the 'reasoning' field, provide a detailed, step-by-step explanation for your choice. Explain which rules were checked for the most likely promotions and what the outcome was (pass/fail). This is the most important part of the output.

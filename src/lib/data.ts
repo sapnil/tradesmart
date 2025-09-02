@@ -48,7 +48,7 @@ export const promotions: Promotion[] = [
     status: 'Active',
     startDate: '2024-07-01',
     endDate: '2024-08-31',
-    type: 'Discount',
+    type: 'Quantity Price Schemes (QPS)',
     uplift: 15.2,
     products: [
         { productId: 'PROD-001', buyQuantity: 6, getQuantity: 1, getSKU: 'PROD-001' }
@@ -103,6 +103,23 @@ export const promotions: Promotion[] = [
     products: [],
     hierarchyIds: ['HIER-S1', 'HIER-S2'],
     productHierarchyIds: ['BRAND-1'],
+  },
+   {
+    id: 'PROMO-006',
+    schemeName: 'Tiered Volume Push',
+    status: 'Active',
+    startDate: '2024-08-01',
+    endDate: '2024-09-30',
+    type: 'Tiered Volume Discount',
+    uplift: 18.0,
+    products: [],
+    hierarchyIds: ['HIER-R2'],
+    productHierarchyIds: ['BRAND-2'],
+    discountTiers: [
+        { minQuantity: 10, maxQuantity: 49, discountPercentage: 5 },
+        { minQuantity: 50, maxQuantity: 99, discountPercentage: 10 },
+        { minQuantity: 100, maxQuantity: 9999, discountPercentage: 15 },
+    ]
   },
 ];
 

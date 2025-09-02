@@ -5,7 +5,9 @@ export type SalesData = {
 };
 
 export const promotionTypes = [
-  'Quantity Price Schemes (QPS)',
+  'Discount', // Simple discount %
+  'Tiered Volume Discount', // Discount % based on quantity
+  'Quantity Price Schemes (QPS)', // Buy X Get Y
   'Rebate and Loyalty Programs',
   'Free Goods and Sampling Schemes',
   'Channel-Specific Schemes',
@@ -17,7 +19,6 @@ export const promotionTypes = [
   'Performance-Driven Incentives',
   'Trade Contests and Incentives',
   'Display and Visibility Support',
-  'Discount',
   'Bundle',
   'Freebie',
   'Contest',
@@ -45,6 +46,12 @@ export type PromotionProduct = {
     getSKU: string;
 }
 
+export type DiscountTier = {
+    minQuantity: number;
+    maxQuantity: number;
+    discountPercentage: number;
+}
+
 export type OrganizationHierarchy = {
   id: string;
   name: string;
@@ -63,6 +70,7 @@ export type Promotion = {
   products: PromotionProduct[];
   hierarchyIds: string[];
   productHierarchyIds: string[];
+  discountTiers?: DiscountTier[];
 };
 
 export type OrderItem = {

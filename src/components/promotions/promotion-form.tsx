@@ -61,6 +61,12 @@ const promotionProductSchema = z.object({
   getSKU: z.string().min(1, "Get SKU is required."),
 });
 
+const discountTierSchema = z.object({
+    minQuantity: z.coerce.number().min(1, "Min quantity must be at least 1."),
+    maxQuantity: z.coerce.number().min(1, "Max quantity must be at least 1."),
+    discountPercentage: z.coerce.number().min(1, "Discount must be at least 1%.").max(100, "Discount cannot exceed 100%."),
+});
+
 const formSchema = z.object({
   schemeName: z.string().min(3, "Scheme name must be at least 3 characters."),
   type: z.enum(promotionTypes),
@@ -68,7 +74,8 @@ const formSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
   uplift: z.coerce.number().optional(),
-  products: z.array(promotionProductSchema),
+  products: z.array(promotionProductSchema).optional(),
+  discountTiers: z.array(discountTierSchema).optional(),
   hierarchyIds: z.array(z.string()).min(1, "At least one hierarchy level is required."),
   productHierarchyIds: z.array(z.string()).min(1, "At least one product hierarchy level is required."),
 });
@@ -91,15 +98,22 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       endDate: promotion?.endDate ? new Date(promotion.endDate) : new Date(new Date().setDate(new Date().getDate() + 30)),
       uplift: promotion?.uplift || 0,
       products: promotion?.products || [],
+      discountTiers: promotion?.discountTiers || [],
       hierarchyIds: promotion?.hierarchyIds || [],
       productHierarchyIds: promotion?.productHierarchyIds || []
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields: productFields, append: appendProduct, remove: removeProduct } = useFieldArray({
     control: form.control,
     name: "products",
   });
+
+  const { fields: tierFields, append: appendTier, remove: removeTier } = useFieldArray({
+    control: form.control,
+    name: "discountTiers",
+  });
+
 
   const handlePredictUplift = async () => {
     setIsPredicting(true);
@@ -158,6 +172,8 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
       field.onChange([...currentValues, value]);
     }
   }
+
+  const selectedPromotionType = form.watch("type");
 
   return (
     <Card>
@@ -384,20 +400,21 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                 </FormItem>
               )}
             />
-
+            
+            {selectedPromotionType === 'Quantity Price Schemes (QPS)' && (
             <Card>
                 <CardHeader>
-                    <CardTitle>Products & Offers</CardTitle>
+                    <CardTitle>Products & Offers (QPS)</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {fields.map((field, index) => (
+                    {productFields.map((field, index) => (
                         <div key={field.id} className="space-y-4 border p-4 rounded-md relative">
                              <Button
                                 type="button"
                                 variant="ghost"
                                 size="icon"
                                 className="absolute top-2 right-2"
-                                onClick={() => remove(index)}
+                                onClick={() => removeProduct(index)}
                                 >
                                 <Trash className="h-4 w-4" />
                             </Button>
@@ -483,12 +500,87 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => append({ productId: '', buyQuantity: 1, getQuantity: 1, getSKU: '' })}
+                        onClick={() => appendProduct({ productId: '', buyQuantity: 1, getQuantity: 1, getSKU: '' })}
                     >
                        <PlusCircle className="mr-2 h-4 w-4" /> Add Product Rule
                     </Button>
                 </CardContent>
             </Card>
+            )}
+
+            {selectedPromotionType === 'Tiered Volume Discount' && (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Discount Tiers</CardTitle>
+                    <FormDescription>Define quantity ranges and the discount for each.</FormDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {tierFields.map((field, index) => (
+                        <div key={field.id} className="space-y-4 border p-4 rounded-md relative">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2"
+                                onClick={() => removeTier(index)}
+                            >
+                                <Trash className="h-4 w-4" />
+                            </Button>
+                            <div className="grid md:grid-cols-3 gap-4 items-end">
+                               <FormField
+                                    control={form.control}
+                                    name={`discountTiers.${index}.minQuantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Min Quantity</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 10" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                               <FormField
+                                    control={form.control}
+                                    name={`discountTiers.${index}.maxQuantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Max Quantity</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 49" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                               <FormField
+                                    control={form.control}
+                                    name={`discountTiers.${index}.discountPercentage`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Discount (%)</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 5" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => appendTier({ minQuantity: 1, maxQuantity: 1, discountPercentage: 0 })}
+                    >
+                       <PlusCircle className="mr-2 h-4 w-4" /> Add Tier
+                    </Button>
+                </CardContent>
+            </Card>
+            )}
+
 
             <div className="space-y-4">
               <FormField

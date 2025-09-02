@@ -1,3 +1,4 @@
+
 export type SalesData = {
   month: string;
   sales: number;
@@ -24,6 +25,19 @@ export const promotionTypes = [
 
 export type PromotionType = (typeof promotionTypes)[number];
 
+export type Product = {
+    id: string;
+    name: string;
+    sku: string;
+};
+
+export type PromotionProduct = {
+    productId: string;
+    buyQuantity: number;
+    getQuantity: number;
+    getSKU: string;
+}
+
 export type Promotion = {
   id: string;
   schemeName: string;
@@ -32,4 +46,5 @@ export type Promotion = {
   endDate: string;
   type: PromotionType;
   uplift: number;
+  products: PromotionProduct[];
 };

@@ -1,7 +1,8 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusCircle, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { promotionTypes, type Promotion } from "@/types";
 import { useRouter } from "next/navigation";
@@ -45,6 +46,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { products } from "@/lib/data";
+import { Separator } from "@/components/ui/separator";
+
+const promotionProductSchema = z.object({
+  productId: z.string().min(1, "Product is required."),
+  buyQuantity: z.coerce.number().min(1, "Buy quantity must be at least 1."),
+  getQuantity: z.coerce.number().min(1, "Get quantity must be at least 1."),
+  getSKU: z.string().min(1, "Get SKU is required."),
+});
 
 const formSchema = z.object({
   schemeName: z.string().min(3, "Scheme name must be at least 3 characters."),
@@ -53,6 +63,7 @@ const formSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
   uplift: z.coerce.number().optional(),
+  products: z.array(promotionProductSchema),
 });
 
 type PromotionFormValues = z.infer<typeof formSchema>;
@@ -65,15 +76,22 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
     ...promotion,
     startDate: new Date(promotion.startDate),
     endDate: new Date(promotion.endDate),
+    products: promotion.products || [],
   } : {
     schemeName: "",
-    status: "Upcoming",
+    status: "Upcoming" as const,
     uplift: 0,
+    products: [],
   };
 
   const form = useForm<PromotionFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "products",
   });
 
   const onSubmit = (data: PromotionFormValues) => {
@@ -249,6 +267,111 @@ export function PromotionForm({ promotion }: { promotion?: Promotion }) {
                 )}
               />
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Products & Offers</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {fields.map((field, index) => (
+                        <div key={field.id} className="space-y-4 border p-4 rounded-md relative">
+                             <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2"
+                                onClick={() => remove(index)}
+                                >
+                                <Trash className="h-4 w-4" />
+                            </Button>
+                            <FormField
+                                control={form.control}
+                                name={`products.${index}.productId`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Buy Product</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a product to apply promotion" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {products.map((product) => (
+                                                    <SelectItem key={product.id} value={product.id}>
+                                                        {product.name} ({product.sku})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="grid md:grid-cols-3 gap-4">
+                               <FormField
+                                    control={form.control}
+                                    name={`products.${index}.buyQuantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Buy Quantity</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 6" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`products.${index}.getQuantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Get Quantity</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="e.g. 1" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`products.${index}.getSKU`}
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Get Product (Free)</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select free product" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {products.map((product) => (
+                                                    <SelectItem key={product.id} value={product.id}>
+                                                        {product.name} ({product.sku})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            </div>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => append({ productId: '', buyQuantity: 1, getQuantity: 1, getSKU: '' })}
+                    >
+                       <PlusCircle className="mr-2 h-4 w-4" /> Add Product Rule
+                    </Button>
+                </CardContent>
+            </Card>
 
             <FormField
               control={form.control}

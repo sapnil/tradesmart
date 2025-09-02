@@ -74,6 +74,12 @@ export type OrganizationHierarchy = {
   parentId?: string;
 }
 
+export type OrganizationGroup = {
+  id: string;
+  name: string;
+  memberIds: string[];
+};
+
 export type Promotion = {
   id: string;
   schemeName: string;

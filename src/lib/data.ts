@@ -1,5 +1,5 @@
 
-import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order } from '@/types';
+import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -37,10 +37,19 @@ export const organizationHierarchy: OrganizationHierarchy[] = [
     { id: 'HIER-A1', name: 'North Delhi', level: 'Area', parentId: 'HIER-S1' },
     { id: 'HIER-D1', name: 'Gupta Distributors', level: 'Distributor', parentId: 'HIER-A1' },
     { id: 'HIER-RET1', name: 'Sharma Kirana Store', level: 'Retailer', parentId: 'HIER-D1' },
+    { id: 'HIER-D2', name: 'Modern Traders', level: 'Distributor', parentId: 'HIER-A1' },
+    { id: 'HIER-RET2', name: 'City Supermart', level: 'Retailer', parentId: 'HIER-D2' },
     { id: 'HIER-S2', name: 'Punjab', level: 'State', parentId: 'HIER-R1' },
     { id: 'HIER-R2', name: 'West', level: 'Region' },
     { id: 'HIER-S3', name: 'Maharashtra', level: 'State', parentId: 'HIER-R2' },
+    { id: 'HIER-D3', name: 'Patel Trading Co.', level: 'Distributor', parentId: 'HIER-S3' },
 ];
+
+export const organizationGroups: OrganizationGroup[] = [
+    { id: 'GROUP-1', name: 'High-Performing Distributors', memberIds: ['HIER-D1', 'HIER-D2'] },
+    { id: 'GROUP-2', name: 'New Retailers Onboarding', memberIds: ['HIER-RET1', 'HIER-RET2'] },
+];
+
 
 export const promotions: Promotion[] = [
   {

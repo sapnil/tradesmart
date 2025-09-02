@@ -74,6 +74,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
+    { href: "/organization-groups", icon: Users, label: "Organization Groups" },
     { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
   ];
 

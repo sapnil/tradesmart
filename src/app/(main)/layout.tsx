@@ -28,6 +28,8 @@ import {
   Users,
   FileText,
   Telescope,
+  Cog,
+  BookCopy,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -80,6 +82,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
     { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
     { href: "/competitor-analysis", icon: Telescope, label: "Competitor Analysis" },
+    { href: "/rule-builder", icon: Cog, label: "Dynamic Rule Builder"},
+    { href: "/dynamic-rule-simulator", icon: BookCopy, label: "Dynamic Rule Simulator"},
   ];
 
   const reportsNavItems = [

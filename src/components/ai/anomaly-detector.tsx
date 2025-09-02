@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -17,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 
 export function AnomalyDetector() {

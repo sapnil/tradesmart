@@ -13,7 +13,15 @@ import {
   SidebarTrigger,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
   LayoutDashboard,
   Megaphone,
@@ -32,6 +40,7 @@ import {
   BookCopy,
   FlaskConical,
   Settings,
+  ChevronDown,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -71,12 +80,15 @@ function Logo() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/promotions", icon: Megaphone, label: "Promotions" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
-    { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
   ];
+
+  const promotionNavItems = [
+    { href: "/promotions", label: "Manage Promotions" },
+    { href: "/rules", label: "Promotion Simulator" },
+  ]
 
   const setupNavItems = [
      { href: "/organization-groups", icon: Users, label: "Organization Groups" },
@@ -118,6 +130,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+             <SidebarMenuItem>
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="Promotions" className="justify-between group-data-[collapsible=icon]:justify-center">
+                    <div className="flex items-center gap-2">
+                      <Megaphone />
+                      <span>Promotions</span>
+                    </div>
+                    <ChevronDown className="group-data-[collapsible=icon]:hidden" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {promotionNavItems.map((item) => (
+                      <SidebarMenuSubItem key={item.href}>
+                         <SidebarMenuSubButton asChild>
+                            <Link href={item.href}>{item.label}</Link>
+                         </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </Collapsible>
+            </SidebarMenuItem>
           </SidebarMenu>
           <SidebarGroup>
             <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
@@ -135,7 +171,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </SidebarGroup>
            <SidebarGroup>
-            <SidebarGroupLabel>Reports</SidebarGroupLabel>
+            <SidebarGroupLabel>Reports/Analytics</SidebarGroupLabel>
             <SidebarMenu>
               {reportsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>

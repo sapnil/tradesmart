@@ -13,15 +13,7 @@ import {
   SidebarTrigger,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import {
   LayoutDashboard,
   Megaphone,
@@ -40,7 +32,6 @@ import {
   BookCopy,
   FlaskConical,
   Settings,
-  ChevronDown,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -86,8 +77,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ];
 
   const promotionNavItems = [
-    { href: "/promotions", label: "Manage Promotions" },
-    { href: "/rules", label: "Promotion Simulator" },
+    { href: "/promotions", icon: Megaphone, label: "Manage Promotions" },
+    { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
   ]
 
   const setupNavItems = [
@@ -130,31 +121,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-             <SidebarMenuItem>
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="Promotions" className="justify-between group-data-[collapsible=icon]:justify-center">
-                    <div className="flex items-center gap-2">
-                      <Megaphone />
-                      <span>Promotions</span>
-                    </div>
-                    <ChevronDown className="group-data-[collapsible=icon]:hidden" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {promotionNavItems.map((item) => (
-                      <SidebarMenuSubItem key={item.href}>
-                         <SidebarMenuSubButton asChild>
-                            <Link href={item.href}>{item.label}</Link>
-                         </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
-            </SidebarMenuItem>
           </SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupLabel>Promotions</SidebarGroupLabel>
+            <SidebarMenu>
+              {promotionNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
             <SidebarMenu>

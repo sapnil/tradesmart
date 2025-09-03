@@ -111,7 +111,6 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
   const { toast } = useToast();
   const [isPredicting, setIsPredicting] = useState(false);
   const [prediction, setPrediction] = useState<PredictPromotionUpliftOutput | null>(null);
-  const [isNotifying, setIsNotifying] = useState(false);
   
   const form = useForm<PromotionFormValues>({
     resolver: zodResolver(formSchema),
@@ -159,96 +158,6 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     name: "mustBuyProducts",
   });
 
-  const getTargetedDistributors = (): DistributorInfo[] => {
-    const formValues = form.getValues();
-    const targetedDistributorIds = new Set<string>();
-
-    const allDistributors = organizationHierarchy.filter(h => h.level === 'Distributor');
-    const distributorsById = new Map(allDistributors.map(d => [d.id, d]));
-
-    // 1. Get distributors from hierarchyIds
-    const hierarchyIdSet = new Set(formValues.hierarchyIds);
-    const nodesToProcess = organizationHierarchy.filter(h => hierarchyIdSet.has(h.id));
-    const processedNodes = new Set<string>();
-
-    while(nodesToProcess.length > 0) {
-        const node = nodesToProcess.pop();
-        if (!node || processedNodes.has(node.id)) continue;
-        processedNodes.add(node.id);
-
-        if (node.level === 'Distributor') {
-            targetedDistributorIds.add(node.id);
-        } else {
-            organizationHierarchy
-                .filter(child => child.parentId === node.id)
-                .forEach(child => nodesToProcess.push(child));
-        }
-    }
-
-    // 2. Get distributors from organizationGroupIds
-    if (formValues.organizationGroupIds) {
-        const groupMembers = organizationGroups
-            .filter(g => formValues.organizationGroupIds?.includes(g.id))
-            .flatMap(g => g.memberIds);
-        
-        groupMembers.forEach(memberId => {
-            if(distributorsById.has(memberId)) {
-                targetedDistributorIds.add(memberId);
-            }
-        });
-    }
-
-    // 3. Create final list with emails
-    return Array.from(targetedDistributorIds)
-        .map(id => {
-            const distributor = distributorsById.get(id);
-            if (!distributor) return null;
-            return {
-                id,
-                name: distributor.name,
-                // Replace with actual email in a real app
-                email: `${distributor.name.toLowerCase().replace(/ /g, '.')}@example.com`,
-            };
-        })
-        .filter((d): d is DistributorInfo => d !== null);
-  };
-
-  const handleNotify = async () => {
-    setIsNotifying(true);
-    try {
-        const targetedDistributors = getTargetedDistributors();
-        if (targetedDistributors.length === 0) {
-            toast({
-                title: "No distributors to notify",
-                description: "This promotion does not target any specific distributors.",
-                variant: "destructive"
-            });
-            return;
-        }
-
-        await generateNotification({
-            promotionJson: JSON.stringify(form.getValues(), null, 2),
-            distributorsJson: JSON.stringify(targetedDistributors, null, 2),
-        });
-
-        toast({
-            title: "Notifications Sent!",
-            description: `A notification has been queued for ${targetedDistributors.length} targeted distributors.`
-        });
-
-    } catch (error) {
-        console.error("Failed to send notifications:", error);
-        toast({
-            title: "Notification Failed",
-            description: "An error occurred while sending notifications.",
-            variant: "destructive",
-        });
-    } finally {
-        setIsNotifying(false);
-    }
-  };
-
-
   const handlePredictUplift = async () => {
     setIsPredicting(true);
     setPrediction(null);
@@ -280,20 +189,6 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     toast({
       title: `Promotion ${promotion?.id ? 'updated' : 'created'}`,
       description: `The promotion "${data.schemeName}" has been successfully ${promotion?.id ? 'updated' : 'created'}.`,
-    });
-    router.push("/promotions");
-    // In a real app, you might want to revalidate the data
-    // For this example, we'll just navigate back
-  };
-
-  const onDelete = () => {
-    if (!promotion) return;
-    // Here you would call an API to delete the promotion
-    console.log("Deleting promotion", promotion.id);
-    toast({
-        title: "Promotion deleted",
-        description: `The promotion "${promotion.schemeName}" has been deleted.`,
-        variant: "destructive",
     });
     router.push("/promotions");
   };
@@ -1080,55 +975,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
             </div>
 
 
-            <div className="flex justify-between">
-                <div className="flex gap-2">
-                    {promotion?.id && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                        <Button type="button" variant="destructive">Delete Promotion</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the
-                            promotion &quot;{promotion.schemeName}&quot;.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={onDelete}>
-                            Delete
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    )}
-                    {promotion?.id && (
-                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button type="button" variant="outline" disabled={isNotifying}>
-                                <Send className="mr-2 h-4 w-4" />
-                                Notify Accounts
-                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Confirm Notifications</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This will generate and send a notification to all targeted distributors. Are you sure you want to continue?
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleNotify} disabled={isNotifying}>
-                                {isNotifying ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</> : "Send Notifications"}
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    )}
-                </div>
+            <div className="flex justify-end">
               <div className="flex gap-2">
                  <Button type="button" variant="outline" onClick={() => router.push('/promotions')}>
                     Cancel

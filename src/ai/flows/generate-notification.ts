@@ -9,43 +9,12 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-
-export const DistributorInfoSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string().email(),
-});
-export type DistributorInfo = z.infer<typeof DistributorInfoSchema>;
-
-export const GenerateNotificationInputSchema = z.object({
-  promotionJson: z
-    .string()
-    .describe('The full details of the promotion as a JSON string.'),
-  distributorsJson: z
-    .string()
-    .describe(
-      'A list of targeted distributors as a JSON string. Each distributor has an id, name, and email.'
-    ),
-});
-export type GenerateNotificationInput = z.infer<
-  typeof GenerateNotificationInputSchema
->;
-
-const NotificationSchema = z.object({
-  distributorId: z.string(),
-  subject: z.string().describe('A catchy and relevant email subject line.'),
-  body: z.string().describe('A personalized and concise email body.'),
-});
-
-export const GenerateNotificationOutputSchema = z.object({
-  notifications: z
-    .array(NotificationSchema)
-    .describe('A list of personalized notifications for each distributor.'),
-});
-export type GenerateNotificationOutput = z.infer<
-  typeof GenerateNotificationOutputSchema
->;
+import {
+  GenerateNotificationInput,
+  GenerateNotificationInputSchema,
+  GenerateNotificationOutput,
+  GenerateNotificationOutputSchema,
+} from '@/types';
 
 export async function generateNotification(
   input: GenerateNotificationInput

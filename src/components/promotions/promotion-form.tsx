@@ -33,7 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CalendarIcon, PlusCircle, Sparkles, Trash, X, Loader2, Send } from "lucide-react";
 import { format } from "date-fns";
-import { promotionTypes, type Promotion } from "@/types";
+import { promotionTypes, type Promotion, type DistributorInfo } from "@/types";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -55,7 +55,7 @@ import { PredictPromotionUpliftOutput } from "@/types/promotions";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "../ui/textarea";
-import { generateNotification, DistributorInfo } from "@/ai/flows/generate-notification";
+import { generateNotification } from "@/ai/flows/generate-notification";
 
 const promotionProductSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -1107,7 +1107,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                     {promotion?.id && (
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           <Button type="button" variant="outline">
+                           <Button type="button" variant="outline" disabled={isNotifying}>
                                 <Send className="mr-2 h-4 w-4" />
                                 Notify Accounts
                            </Button>

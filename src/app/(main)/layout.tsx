@@ -32,6 +32,7 @@ import {
   BookCopy,
   FlaskConical,
   Settings,
+  Bell,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -96,6 +97,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const reportsNavItems = [
     { href: "/participation-report", icon: Users, label: "Retailer Participation Report"},
     { href: "/retailer-profiling", icon: FileText, label: "Retailer Profiling"},
+    { href: "/notifications", icon: Bell, label: "Sent Notifications"},
   ];
 
   const experimentalNavItems = [

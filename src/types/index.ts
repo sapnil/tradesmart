@@ -122,6 +122,15 @@ export type Order = {
   items: OrderItem[];
 };
 
+export type SentNotification = {
+    id: string;
+    distributorName: string;
+    promotionName: string;
+    subject: string;
+    body: string;
+    sentDate: string;
+};
+
 // Types for GenerateNotification Flow
 export const DistributorInfoSchema = z.object({
   id: z.string(),

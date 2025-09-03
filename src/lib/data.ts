@@ -1,6 +1,6 @@
 
 
-import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup } from '@/types';
+import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup, SentNotification } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -256,5 +256,32 @@ export const orders: Order[] = [
         items: [
             { productId: 'PROD-002', quantity: 400, price: 35 },
         ],
+    },
+];
+
+export const sentNotifications: SentNotification[] = [
+    {
+        id: 'NOTIF-001',
+        distributorName: 'Gupta Distributors',
+        promotionName: 'Monsoon Bonanza',
+        subject: 'New Promotion for You: Monsoon Bonanza!',
+        body: 'Dear Gupta Distributors, get ready for the Monsoon Bonanza! Buy 6 Cool Cola 300ml and get 1 absolutely free. Offer valid from July 1 to Aug 31.',
+        sentDate: '2024-07-01',
+    },
+    {
+        id: 'NOTIF-002',
+        distributorName: 'Modern Traders',
+        promotionName: 'Monsoon Bonanza',
+        subject: 'New Promotion for You: Monsoon Bonanza!',
+        body: 'Dear Modern Traders, get ready for the Monsoon Bonanza! Buy 6 Cool Cola 300ml and get 1 absolutely free. Offer valid from July 1 to Aug 31.',
+        sentDate: '2024-07-01',
+    },
+    {
+        id: 'NOTIF-003',
+        distributorName: 'Patel Trading Co.',
+        promotionName: 'Independence Day Special',
+        subject: 'Get ready for our Independence Day Special!',
+        body: 'Dear Patel Trading Co., celebrate with our Independence Day Special! Offer a bundle of Cool Cola 500ml and Zesty Orange 500ml for just ₹65. Offer valid from Aug 10 to Aug 20.',
+        sentDate: '2024-08-09',
     },
 ];

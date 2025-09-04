@@ -82,7 +82,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const promotionNavItems = [
     { href: "/promotions", icon: Megaphone, label: "Manage Promotions" },
-    { href: "/rules", icon: SlidersHorizontal, label: "Promotion Simulator" },
+    { href: "/rules", icon: SlidersHorizontal, label: "Promotion Impact Simulator" },
+    { href: "/test-order-simulator", icon: FlaskConical, label: "Test Order Simulator" },
   ]
 
   const setupNavItems = [

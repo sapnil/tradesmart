@@ -1,6 +1,6 @@
 
 
-import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup, SentNotification } from '@/types';
+import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup, SentNotification, Budget } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -284,4 +284,11 @@ export const sentNotifications: SentNotification[] = [
         body: 'Dear Patel Trading Co., celebrate with our Independence Day Special! Offer a bundle of Cool Cola 500ml and Zesty Orange 500ml for just ₹65. Offer valid from Aug 10 to Aug 20.',
         sentDate: '2024-08-09',
     },
+];
+
+export const initialBudgets: Budget[] = [
+    { id: 'BUD-001', name: 'Q3 North Region Beverage Budget', period: 'Q3 2024', totalAmount: 500000, allocatedAmount: 150000, spentAmount: 75000, targetIds: ['HIER-R1', 'CAT-1'], promotionTypes: ['Discount', 'Quantity-Based Freebie (Buy X, Get Y)'] },
+    { id: 'BUD-002', name: 'Annual Maharashtra Budget', period: '2024', totalAmount: 2000000, allocatedAmount: 800000, spentAmount: 650000, targetIds: ['HIER-S3'], promotionTypes: [] },
+    { id: 'BUD-003', name: 'Diwali Dhamaka Campaign', period: 'Q4 2024', totalAmount: 1000000, allocatedAmount: 0, spentAmount: 0, targetIds: [], promotionTypes: ['Contest'] },
+    { id: 'BUD-004', name: 'Delhi Marketing Budget', period: 'Q3 2024', totalAmount: 100000, allocatedAmount: 0, spentAmount: 0, targetIds: ['HIER-S1'], parentId: 'BUD-001', promotionTypes: [] },
 ];

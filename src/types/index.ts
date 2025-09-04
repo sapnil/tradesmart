@@ -176,5 +176,6 @@ export type Budget = {
     allocatedAmount: number;
     spentAmount: number;
     targetIds: string[];
+    promotionTypes: PromotionType[];
     parentId?: string;
 };

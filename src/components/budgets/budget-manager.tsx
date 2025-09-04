@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -44,7 +45,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { type Budget } from "@/types";
+import { type Budget, type PromotionType, promotionTypes } from "@/types";
 import {
     Select,
     SelectContent,
@@ -52,15 +53,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { organizationHierarchy, productHierarchy } from "@/lib/data";
-
-const initialBudgets: Budget[] = [
-    { id: 'BUD-001', name: 'Q3 North Region Beverage Budget', period: 'Q3 2024', totalAmount: 500000, allocatedAmount: 150000, spentAmount: 75000, targetIds: ['HIER-R1', 'CAT-1'] },
-    { id: 'BUD-002', name: 'Annual Maharashtra Budget', period: '2024', totalAmount: 2000000, allocatedAmount: 800000, spentAmount: 650000, targetIds: ['HIER-S3'] },
-    { id: 'BUD-003', name: 'Diwali Dhamaka Campaign', period: 'Q4 2024', totalAmount: 1000000, allocatedAmount: 0, spentAmount: 0, targetIds: [] },
-    { id: 'BUD-004', name: 'Delhi Marketing Budget', period: 'Q3 2024', totalAmount: 100000, allocatedAmount: 0, spentAmount: 0, targetIds: ['HIER-S1'], parentId: 'BUD-001' },
-];
-
+import { organizationHierarchy, productHierarchy, initialBudgets } from "@/lib/data";
 
 const formSchema = z.object({
   name: z.string().min(3, "Budget name must be at least 3 characters."),
@@ -68,6 +61,7 @@ const formSchema = z.object({
   totalAmount: z.coerce.number().min(1, "Total amount must be greater than 0."),
   parentId: z.string().optional(),
   targetIds: z.array(z.string()).optional(),
+  promotionTypes: z.array(z.string()).optional(),
 });
 
 type BudgetFormValues = z.infer<typeof formSchema>;
@@ -85,6 +79,7 @@ export function BudgetManager() {
       totalAmount: 0,
       parentId: undefined,
       targetIds: [],
+      promotionTypes: [],
     },
   });
   
@@ -106,12 +101,15 @@ export function BudgetManager() {
       return allTargets.find(t => t.id === targetId)?.name || "Unknown";
   }
 
-  const handleMultiSelectChange = (value: string) => {
-    const currentValues = form.getValues("targetIds") || [];
+  const handleMultiSelectChange = (
+    fieldName: "targetIds" | "promotionTypes", 
+    value: string
+    ) => {
+    const currentValues = form.getValues(fieldName) || [];
     if (currentValues.includes(value)) {
-      form.setValue("targetIds", currentValues.filter((v) => v !== value));
+      form.setValue(fieldName, currentValues.filter((v) => v !== value));
     } else {
-      form.setValue("targetIds", [...currentValues, value]);
+      form.setValue(fieldName, [...currentValues, value]);
     }
   };
 
@@ -125,6 +123,7 @@ export function BudgetManager() {
       allocatedAmount: 0,
       spentAmount: 0,
       targetIds: data.targetIds || [],
+      promotionTypes: (data.promotionTypes as PromotionType[]) || [],
       parentId: data.parentId === 'none' ? undefined : data.parentId,
     };
     
@@ -245,7 +244,7 @@ export function BudgetManager() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Targets (Optional)</FormLabel>
-                                            <Select onValueChange={handleMultiSelectChange}>
+                                            <Select onValueChange={(value) => handleMultiSelectChange("targetIds", value)}>
                                                 <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select targets (e.g., regions, brands)" />
@@ -265,12 +264,46 @@ export function BudgetManager() {
                                                     return item ? (
                                                         <Badge key={id} variant="secondary" className="flex items-center gap-1">
                                                             {item.name}
-                                                            <button type="button" onClick={() => handleMultiSelectChange(id)} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                                            <button type="button" onClick={() => handleMultiSelectChange("targetIds", id)} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
                                                                 <X className="h-3 w-3"/>
                                                             </button>
                                                         </Badge>
                                                     ) : null
                                                 })}
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="promotionTypes"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Allowed Promotion Types (Optional)</FormLabel>
+                                            <Select onValueChange={(value) => handleMultiSelectChange("promotionTypes", value)}>
+                                                <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select promotion types" />
+                                                </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {promotionTypes.map((type) => (
+                                                        <SelectItem key={type} value={type}>
+                                                            {type}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                             <div className="flex flex-wrap gap-2 pt-2">
+                                                {field.value?.map(type => (
+                                                    <Badge key={type} variant="secondary" className="flex items-center gap-1">
+                                                        {type}
+                                                        <button type="button" onClick={() => handleMultiSelectChange("promotionTypes", type)} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                                            <X className="h-3 w-3"/>
+                                                        </button>
+                                                    </Badge>
+                                                ))}
                                             </div>
                                             <FormMessage />
                                         </FormItem>
@@ -291,6 +324,7 @@ export function BudgetManager() {
                             <TableHead>Budget Name</TableHead>
                             <TableHead>Parent</TableHead>
                             <TableHead>Targets</TableHead>
+                            <TableHead>Promotion Types</TableHead>
                             <TableHead>Period</TableHead>
                             <TableHead className="text-right">Total Amount</TableHead>
                             <TableHead>Consumption</TableHead>
@@ -303,10 +337,17 @@ export function BudgetManager() {
                                 <TableCell className="font-medium">{budget.name}</TableCell>
                                 <TableCell>{getParentName(budget.parentId)}</TableCell>
                                 <TableCell>
-                                    <div className="flex flex-wrap gap-1">
+                                    <div className="flex flex-wrap gap-1 max-w-xs">
                                         {budget.targetIds.length > 0 ? budget.targetIds.map(id => (
                                             <Badge key={id} variant="outline">{getTargetName(id)}</Badge>
                                         )) : <span className="text-muted-foreground">N/A</span>}
+                                    </div>
+                                </TableCell>
+                                 <TableCell>
+                                    <div className="flex flex-wrap gap-1 max-w-xs">
+                                        {budget.promotionTypes.length > 0 ? budget.promotionTypes.map(type => (
+                                            <Badge key={type} variant="outline">{type}</Badge>
+                                        )) : <span className="text-muted-foreground">Any</span>}
                                     </div>
                                 </TableCell>
                                 <TableCell>

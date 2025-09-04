@@ -3,6 +3,9 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,12 +25,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { type Budget } from "@/types";
+import { type Budget, type PromotionType } from "@/types";
 import { organizationHierarchy, productHierarchy, initialBudgets } from "@/lib/data";
+import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
 
 export function BudgetManager() {
+  const { toast } = useToast();
   const [budgets, setBudgets] = useState<Budget[]>(initialBudgets);
   
   const formatCurrency = (amount: number) =>

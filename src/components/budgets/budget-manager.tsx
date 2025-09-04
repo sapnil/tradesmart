@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Wallet, Calendar, Tag, Trash2, Edit } from "lucide-react";
+import { PlusCircle, Wallet, Calendar, Tag, Trash2, Edit, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -52,6 +52,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { organizationHierarchy, productHierarchy } from "@/lib/data";
 
 const initialBudgets: Budget[] = [
     { id: 'BUD-001', name: 'Q3 North Region Beverage Budget', period: 'Q3 2024', totalAmount: 500000, allocatedAmount: 150000, spentAmount: 75000, targetIds: ['HIER-R1', 'CAT-1'] },
@@ -66,6 +67,7 @@ const formSchema = z.object({
   period: z.string().min(1, "Period is required."),
   totalAmount: z.coerce.number().min(1, "Total amount must be greater than 0."),
   parentId: z.string().optional(),
+  targetIds: z.array(z.string()).optional(),
 });
 
 type BudgetFormValues = z.infer<typeof formSchema>;
@@ -82,6 +84,7 @@ export function BudgetManager() {
       period: "",
       totalAmount: 0,
       parentId: undefined,
+      targetIds: [],
     },
   });
   
@@ -97,6 +100,22 @@ export function BudgetManager() {
     return budgets.find(b => b.id === parentId)?.name || "Unknown";
   }
 
+  const allTargets = [...organizationHierarchy, ...productHierarchy];
+  
+  const getTargetName = (targetId: string) => {
+      return allTargets.find(t => t.id === targetId)?.name || "Unknown";
+  }
+
+  const handleMultiSelectChange = (value: string) => {
+    const currentValues = form.getValues("targetIds") || [];
+    if (currentValues.includes(value)) {
+      form.setValue("targetIds", currentValues.filter((v) => v !== value));
+    } else {
+      form.setValue("targetIds", [...currentValues, value]);
+    }
+  };
+
+
   const onSubmit = (data: BudgetFormValues) => {
     const newBudget: Budget = {
       id: `BUD-${Date.now()}`,
@@ -105,7 +124,7 @@ export function BudgetManager() {
       totalAmount: data.totalAmount,
       allocatedAmount: 0,
       spentAmount: 0,
-      targetIds: [],
+      targetIds: data.targetIds || [],
       parentId: data.parentId === 'none' ? undefined : data.parentId,
     };
     
@@ -220,6 +239,43 @@ export function BudgetManager() {
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name="targetIds"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Targets (Optional)</FormLabel>
+                                            <Select onValueChange={handleMultiSelectChange}>
+                                                <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select targets (e.g., regions, brands)" />
+                                                </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {allTargets.map((target) => (
+                                                        <SelectItem key={target.id} value={target.id}>
+                                                        {target.name} ({target.level})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                             <div className="flex flex-wrap gap-2 pt-2">
+                                                {field.value?.map(id => {
+                                                    const item = allTargets.find(h => h.id === id);
+                                                    return item ? (
+                                                        <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                                                            {item.name}
+                                                            <button type="button" onClick={() => handleMultiSelectChange(id)} className="rounded-full hover:bg-muted-foreground/20 p-0.5">
+                                                                <X className="h-3 w-3"/>
+                                                            </button>
+                                                        </Badge>
+                                                    ) : null
+                                                })}
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <DialogFooter>
                                     <Button type="submit">Create Budget</Button>
                                 </DialogFooter>
@@ -234,6 +290,7 @@ export function BudgetManager() {
                         <TableRow>
                             <TableHead>Budget Name</TableHead>
                             <TableHead>Parent</TableHead>
+                            <TableHead>Targets</TableHead>
                             <TableHead>Period</TableHead>
                             <TableHead className="text-right">Total Amount</TableHead>
                             <TableHead>Consumption</TableHead>
@@ -245,6 +302,13 @@ export function BudgetManager() {
                             <TableRow key={budget.id}>
                                 <TableCell className="font-medium">{budget.name}</TableCell>
                                 <TableCell>{getParentName(budget.parentId)}</TableCell>
+                                <TableCell>
+                                    <div className="flex flex-wrap gap-1">
+                                        {budget.targetIds.length > 0 ? budget.targetIds.map(id => (
+                                            <Badge key={id} variant="outline">{getTargetName(id)}</Badge>
+                                        )) : <span className="text-muted-foreground">N/A</span>}
+                                    </div>
+                                </TableCell>
                                 <TableCell>
                                     <Badge variant="outline">{budget.period}</Badge>
                                 </TableCell>

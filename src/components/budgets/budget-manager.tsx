@@ -106,14 +106,14 @@ export function BudgetManager() {
       allocatedAmount: 0,
       spentAmount: 0,
       targetIds: [],
-      parentId: data.parentId,
+      parentId: data.parentId === 'none' ? undefined : data.parentId,
     };
     
     let updatedBudgets = [...budgets, newBudget];
 
-    if (data.parentId) {
+    if (newBudget.parentId) {
         updatedBudgets = updatedBudgets.map(b => {
-            if (b.id === data.parentId) {
+            if (b.id === newBudget.parentId) {
                 return {
                     ...b,
                     allocatedAmount: b.allocatedAmount + data.totalAmount
@@ -169,7 +169,7 @@ export function BudgetManager() {
                                                 </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="">No Parent</SelectItem>
+                                                    <SelectItem value="none">No Parent</SelectItem>
                                                     {budgets.map(budget => (
                                                         <SelectItem key={budget.id} value={budget.id}>
                                                             {budget.name}

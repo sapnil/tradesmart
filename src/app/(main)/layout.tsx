@@ -104,6 +104,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/notifications", icon: Bell, label: "Sent Notifications"},
     { href: "/reports/budget-consumption", icon: AreaChart, label: "Budget Consumption Report"},
     { href: "/reports/promotion-performance", icon: LineChart, label: "Promotion Performance" },
+    { href: "/reports/distributor-schemes", icon: FileText, label: "Distributor Scheme Report" },
   ];
 
   const experimentalNavItems = [

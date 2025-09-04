@@ -23,12 +23,16 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Loader2, Sparkles, Wand2, PlusCircle, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Sparkles, Wand2, PlusCircle, Trash2, CheckCircle, XCircle, CalendarIcon } from "lucide-react";
 import { organizationHierarchy, productHierarchy, promotions, products } from "@/lib/data";
 import { applyPromotionRules } from "@/ai/flows/apply-promotion-rules";
 import { ApplyPromotionRulesOutput } from "@/types/promotions";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Calendar } from "../ui/calendar";
 
 const orderItemSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -37,6 +41,7 @@ const orderItemSchema = z.object({
 
 const formSchema = z.object({
   distributorId: z.string().min(1, { message: "Please select a distributor." }),
+  orderDate: z.date(),
   items: z.array(orderItemSchema).min(1, "Order must have at least one item."),
 });
 
@@ -49,6 +54,7 @@ export function TestOrderSimulator() {
     resolver: zodResolver(formSchema),
     defaultValues: {
         distributorId: "",
+        orderDate: new Date(),
         items: [{ productId: "", quantity: 1 }],
     },
   });
@@ -74,7 +80,7 @@ export function TestOrderSimulator() {
     const testOrder = {
         id: `TEST-${Date.now()}`,
         distributorName: distributor.name,
-        date: new Date().toISOString().split('T')[0],
+        date: format(values.orderDate, 'yyyy-MM-dd'),
         status: 'Pending',
         items: values.items.map(item => {
             const product = products.find(p => p.id === item.productId);
@@ -114,30 +120,70 @@ export function TestOrderSimulator() {
         <CardContent className="space-y-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="distributorId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Select Distributor</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a distributor" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {organizationHierarchy.filter(h => h.level === 'Distributor').map((dist) => (
-                          <SelectItem key={dist.id} value={dist.id}>
-                            {dist.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid md:grid-cols-2 gap-4">
+                 <FormField
+                    control={form.control}
+                    name="distributorId"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Select Distributor</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                            <SelectValue placeholder="Select a distributor" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {organizationHierarchy.filter(h => h.level === 'Distributor').map((dist) => (
+                            <SelectItem key={dist.id} value={dist.id}>
+                                {dist.name}
+                            </SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="orderDate"
+                    render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                        <FormLabel>Order Date</FormLabel>
+                        <Popover>
+                        <PopoverTrigger asChild>
+                            <FormControl>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                "pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                                )}
+                            >
+                                {field.value ? (
+                                format(field.value, "PPP")
+                                ) : (
+                                <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                            </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            />
+                        </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
 
               <Separator />
 

@@ -45,11 +45,19 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { type Budget } from "@/types";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const initialBudgets: Budget[] = [
     { id: 'BUD-001', name: 'Q3 North Region Beverage Budget', period: 'Q3 2024', totalAmount: 500000, allocatedAmount: 150000, spentAmount: 75000, targetIds: ['HIER-R1', 'CAT-1'] },
     { id: 'BUD-002', name: 'Annual Maharashtra Budget', period: '2024', totalAmount: 2000000, allocatedAmount: 800000, spentAmount: 650000, targetIds: ['HIER-S3'] },
     { id: 'BUD-003', name: 'Diwali Dhamaka Campaign', period: 'Q4 2024', totalAmount: 1000000, allocatedAmount: 0, spentAmount: 0, targetIds: [] },
+    { id: 'BUD-004', name: 'Delhi Marketing Budget', period: 'Q3 2024', totalAmount: 100000, allocatedAmount: 0, spentAmount: 0, targetIds: ['HIER-S1'], parentId: 'BUD-001' },
 ];
 
 
@@ -57,6 +65,7 @@ const formSchema = z.object({
   name: z.string().min(3, "Budget name must be at least 3 characters."),
   period: z.string().min(1, "Period is required."),
   totalAmount: z.coerce.number().min(1, "Total amount must be greater than 0."),
+  parentId: z.string().optional(),
 });
 
 type BudgetFormValues = z.infer<typeof formSchema>;
@@ -72,6 +81,7 @@ export function BudgetManager() {
       name: "",
       period: "",
       totalAmount: 0,
+      parentId: undefined,
     },
   });
   
@@ -81,16 +91,39 @@ export function BudgetManager() {
       currency: "INR",
       maximumFractionDigits: 0,
     }).format(amount);
+    
+  const getParentName = (parentId?: string) => {
+    if (!parentId) return "N/A";
+    return budgets.find(b => b.id === parentId)?.name || "Unknown";
+  }
 
   const onSubmit = (data: BudgetFormValues) => {
     const newBudget: Budget = {
       id: `BUD-${Date.now()}`,
-      ...data,
+      name: data.name,
+      period: data.period,
+      totalAmount: data.totalAmount,
       allocatedAmount: 0,
       spentAmount: 0,
       targetIds: [],
+      parentId: data.parentId,
     };
-    setBudgets((prev) => [...prev, newBudget]);
+    
+    let updatedBudgets = [...budgets, newBudget];
+
+    if (data.parentId) {
+        updatedBudgets = updatedBudgets.map(b => {
+            if (b.id === data.parentId) {
+                return {
+                    ...b,
+                    allocatedAmount: b.allocatedAmount + data.totalAmount
+                }
+            }
+            return b;
+        })
+    }
+
+    setBudgets(updatedBudgets);
     toast({
         title: "Budget Created",
         description: `The budget "${data.name}" has been successfully created.`,
@@ -123,6 +156,31 @@ export function BudgetManager() {
                         </DialogHeader>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                                <FormField
+                                    control={form.control}
+                                    name="parentId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Parent Budget (Optional)</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a parent budget" />
+                                                </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="">No Parent</SelectItem>
+                                                    {budgets.map(budget => (
+                                                        <SelectItem key={budget.id} value={budget.id}>
+                                                            {budget.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -175,6 +233,7 @@ export function BudgetManager() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Budget Name</TableHead>
+                            <TableHead>Parent</TableHead>
                             <TableHead>Period</TableHead>
                             <TableHead className="text-right">Total Amount</TableHead>
                             <TableHead>Consumption</TableHead>
@@ -185,6 +244,7 @@ export function BudgetManager() {
                         {budgets.map(budget => (
                             <TableRow key={budget.id}>
                                 <TableCell className="font-medium">{budget.name}</TableCell>
+                                <TableCell>{getParentName(budget.parentId)}</TableCell>
                                 <TableCell>
                                     <Badge variant="outline">{budget.period}</Badge>
                                 </TableCell>

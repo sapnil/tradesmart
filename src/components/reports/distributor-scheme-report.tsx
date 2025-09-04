@@ -27,8 +27,11 @@ import Link from "next/link";
 import { type Promotion, type OrganizationHierarchy } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+type PromotionStatus = 'Active' | 'Upcoming' | 'Expired';
+
 export function DistributorSchemeReport() {
   const [selectedDistributorId, setSelectedDistributorId] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
   const distributors = organizationHierarchy.filter(h => h.level === 'Distributor');
 
@@ -54,13 +57,18 @@ export function DistributorSchemeReport() {
     const distributorHierarchyIds = getDistributorAncestors(selectedDistributorId, organizationHierarchy);
     const distributorGroupIds = new Set(getDistributorGroups(selectedDistributorId));
     
-    return promotions.filter(promo => {
+    const allTargeted = promotions.filter(promo => {
         const hierarchyMatch = promo.hierarchyIds.some(id => distributorHierarchyIds.has(id));
         const groupMatch = promo.organizationGroupIds?.some(id => distributorGroupIds.has(id));
         return hierarchyMatch || groupMatch;
     });
 
-  }, [selectedDistributorId]);
+    if (selectedStatus === 'all') {
+        return allTargeted;
+    }
+    return allTargeted.filter(promo => promo.status === selectedStatus);
+
+  }, [selectedDistributorId, selectedStatus]);
 
   return (
     <Card>
@@ -69,15 +77,26 @@ export function DistributorSchemeReport() {
         <CardDescription>
           Select a distributor to see all the promotion schemes they are eligible for.
         </CardDescription>
-        <div className="pt-4">
+        <div className="flex items-center gap-4 pt-4">
             <Select value={selectedDistributorId ?? ''} onValueChange={setSelectedDistributorId}>
                 <SelectTrigger className="w-[380px]">
-                    <SelectValue placeholder="Select a distributor to view their schemes" />
+                    <SelectValue placeholder="Select a distributor" />
                 </SelectTrigger>
                 <SelectContent>
                     {distributors.map(dist => (
                         <SelectItem key={dist.id} value={dist.id}>{dist.name}</SelectItem>
                     ))}
+                </SelectContent>
+            </Select>
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Upcoming">Upcoming</SelectItem>
+                    <SelectItem value="Expired">Expired</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -116,7 +135,7 @@ export function DistributorSchemeReport() {
             ) : (
                 <TableRow>
                     <TableCell colSpan={5} className="text-center h-24">
-                        No schemes found for this distributor.
+                        No schemes found for this distributor with the selected status.
                     </TableCell>
                 </TableRow>
             )

@@ -34,6 +34,7 @@ import {
   Settings,
   Bell,
   AreaChart,
+  LineChart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -101,6 +102,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/retailer-profiling", icon: FileText, label: "Retailer Profiling"},
     { href: "/notifications", icon: Bell, label: "Sent Notifications"},
     { href: "/reports/budget-consumption", icon: AreaChart, label: "Budget Consumption Report"},
+    { href: "/reports/promotion-performance", icon: LineChart, label: "Promotion Performance" },
   ];
 
   const experimentalNavItems = [

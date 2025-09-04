@@ -73,6 +73,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
+    { href: "/budgets", icon: Wallet, label: "Budgets"},
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
   ];
@@ -89,7 +90,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const aiToolsNavItems = [
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
-    { href: "/budget-allocator", icon: Wallet, label: "Budget Allocator" },
+    { href: "/budget-simulator", icon: Wallet, label: "Budget Simulator" },
     { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
     { href: "/competitor-analysis", icon: Telescope, label: "Competitor Analysis" },
   ];

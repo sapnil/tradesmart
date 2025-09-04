@@ -167,3 +167,14 @@ export const GenerateNotificationOutputSchema = z.object({
 export type GenerateNotificationOutput = z.infer<
   typeof GenerateNotificationOutputSchema
 >;
+
+export type Budget = {
+    id: string;
+    name: string;
+    period: string;
+    totalAmount: number;
+    allocatedAmount: number;
+    spentAmount: number;
+    targetIds: string[];
+    parentId?: string;
+};

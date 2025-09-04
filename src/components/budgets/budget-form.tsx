@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -48,8 +48,17 @@ export function BudgetForm({ budget }: { budget?: Budget }) {
   const { toast } = useToast();
   const router = useRouter();
   
-  // In a real app, this would come from a context or a hook that fetches data.
-  const [budgets, setBudgets] = useState<Budget[]>(initialBudgets);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+
+  useEffect(() => {
+    // Load budgets from localStorage on component mount
+    const storedBudgets = localStorage.getItem('budgets');
+    if (storedBudgets) {
+      setBudgets(JSON.parse(storedBudgets));
+    } else {
+      setBudgets(initialBudgets);
+    }
+  }, []);
 
   const form = useForm<BudgetFormValues>({
     resolver: zodResolver(formSchema),
@@ -78,27 +87,38 @@ export function BudgetForm({ budget }: { budget?: Budget }) {
   };
 
   const onSubmit = (data: BudgetFormValues) => {
+    const isEditing = !!budget;
+    const newBudgetId = isEditing ? budget.id : `BUD-${Date.now()}`;
+    
     const newBudget: Budget = {
-      id: budget?.id || `BUD-${Date.now()}`,
+      id: newBudgetId,
       name: data.name,
       period: data.period,
       totalAmount: data.totalAmount,
-      allocatedAmount: 0,
-      spentAmount: 0,
+      allocatedAmount: budget?.allocatedAmount || 0,
+      spentAmount: budget?.spentAmount || 0,
       targetIds: data.targetIds || [],
       promotionTypes: (data.promotionTypes as PromotionType[]) || [],
       parentId: data.parentId === 'none' ? undefined : data.parentId,
     };
     
-    // This is a mock implementation. In a real app, you'd call an API.
-    console.log("Saving budget:", newBudget);
+    const existingBudgets: Budget[] = JSON.parse(localStorage.getItem('budgets') || JSON.stringify(initialBudgets));
+
+    let updatedBudgets: Budget[];
+
+    if(isEditing) {
+        updatedBudgets = existingBudgets.map(b => b.id === newBudgetId ? newBudget : b);
+    } else {
+        updatedBudgets = [...existingBudgets, newBudget];
+    }
+
+    localStorage.setItem('budgets', JSON.stringify(updatedBudgets));
 
     toast({
-        title: `Budget ${budget ? "Updated" : "Created"}`,
+        title: `Budget ${isEditing ? "Updated" : "Created"}`,
         description: `The budget "${data.name}" has been successfully saved.`,
     });
     
-    // Redirect back to the budget list
     router.push('/budgets');
   };
 
@@ -121,7 +141,7 @@ export function BudgetForm({ budget }: { budget?: Budget }) {
                                     </FormControl>
                                     <SelectContent>
                                         <SelectItem value="none">No Parent</SelectItem>
-                                        {budgets.map(budget => (
+                                        {budgets.filter(b => b.id !== budget?.id).map(budget => (
                                             <SelectItem key={budget.id} value={budget.id}>
                                                 {budget.name}
                                             </SelectItem>

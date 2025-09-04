@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import { allocatePromotionBudget, AllocatePromotionBudgetOutput } from "@/ai/flows/allocate-promotion-budget";
-import { salesData, productHierarchy, organizationHierarchy, promotions } from "@/lib/data";
+import { salesData, productHierarchy, organizationHierarchy, promotions, initialBudgets } from "@/lib/data";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -18,9 +19,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Loader2, Sparkles, Wand2, PlusCircle, ArrowRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { type Budget } from "@/types";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   totalBudget: z.coerce.number().min(10000, { message: "Budget must be at least 10,000." }),
@@ -33,6 +37,8 @@ export function BudgetAllocator() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AllocatePromotionBudgetOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,6 +76,60 @@ export function BudgetAllocator() {
       setLoading(false);
     }
   }
+
+  const handleCreateBudgets = () => {
+    if (!result) return;
+    const { totalBudget, allocationStrategy } = form.getValues();
+    
+    // Load existing budgets from local storage or start with initial data
+    const existingBudgets: Budget[] = JSON.parse(localStorage.getItem('budgets') || JSON.stringify(initialBudgets));
+
+    // Create the main parent budget
+    const parentId = `BUD-${Date.now()}`;
+    const parentBudget: Budget = {
+        id: parentId,
+        name: `Simulated Budget - ${allocationStrategy}`,
+        period: "Simulated",
+        totalAmount: totalBudget,
+        allocatedAmount: 0,
+        spentAmount: 0,
+        targetIds: [],
+        promotionTypes: [],
+    };
+    
+    let totalAllocated = 0;
+    const childBudgets: Budget[] = [];
+
+    // Create child budgets from recommendations
+    result.recommendations.forEach(rec => {
+        const childId = `BUD-${Date.now()}-${Math.random()}`;
+        const childBudget: Budget = {
+            id: childId,
+            name: `${rec.targetType} - ${rec.targetName}`,
+            period: "Simulated",
+            totalAmount: rec.allocatedBudget,
+            allocatedAmount: 0,
+            spentAmount: 0,
+            targetIds: [], // This could be enhanced to map targetName to an ID
+            promotionTypes: [],
+            parentId: parentId,
+        };
+        childBudgets.push(childBudget);
+        totalAllocated += rec.allocatedBudget;
+    });
+
+    parentBudget.allocatedAmount = totalAllocated;
+
+    // Save all new budgets to local storage
+    localStorage.setItem('budgets', JSON.stringify([...existingBudgets, parentBudget, ...childBudgets]));
+
+    toast({
+        title: "Budgets Created Successfully!",
+        description: `${childBudgets.length + 1} new budgets have been created based on the AI recommendations.`,
+    });
+
+    router.push('/budgets');
+  };
 
   return (
     <div className="grid md:grid-cols-2 gap-8 items-start">
@@ -170,6 +230,10 @@ export function BudgetAllocator() {
                     </TableBody>
                    </Table>
                 </div>
+                 <Button onClick={handleCreateBudgets}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create Budgets from Recommendations
+                </Button>
               </div>
             ) : !loading && <div className="text-center text-muted-foreground p-8">Your budget allocation will be displayed here.</div>}
           </CardContent>

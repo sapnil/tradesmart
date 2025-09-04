@@ -1,11 +1,7 @@
 
-
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import {
@@ -25,15 +32,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { type Budget, type PromotionType } from "@/types";
+import { type Budget } from "@/types";
 import { organizationHierarchy, productHierarchy, initialBudgets } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 
 export function BudgetManager() {
   const { toast } = useToast();
-  const [budgets, setBudgets] = useState<Budget[]>(initialBudgets);
+  const router = useRouter();
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+
+  useEffect(() => {
+    // Load budgets from localStorage on component mount
+    const storedBudgets = localStorage.getItem('budgets');
+    if (storedBudgets) {
+      setBudgets(JSON.parse(storedBudgets));
+    } else {
+      setBudgets(initialBudgets);
+    }
+  }, []);
+
+  const saveBudgets = (updatedBudgets: Budget[]) => {
+    setBudgets(updatedBudgets);
+    localStorage.setItem('budgets', JSON.stringify(updatedBudgets));
+  };
   
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -52,6 +76,30 @@ export function BudgetManager() {
   const getTargetName = (targetId: string) => {
       return allTargets.find(t => t.id === targetId)?.name || "Unknown";
   }
+
+  const handleDelete = (budgetId: string) => {
+    const budgetToDelete = budgets.find(b => b.id === budgetId);
+    if (!budgetToDelete) return;
+
+    // Prevent deletion if it has children
+    const hasChildren = budgets.some(b => b.parentId === budgetId);
+    if (hasChildren) {
+        toast({
+            title: "Cannot Delete Budget",
+            description: `Budget "${budgetToDelete.name}" has child budgets. Please delete or reassign them first.`,
+            variant: "destructive",
+        });
+        return;
+    }
+
+    const updatedBudgets = budgets.filter(b => b.id !== budgetId);
+    saveBudgets(updatedBudgets);
+
+    toast({
+        title: "Budget Deleted",
+        description: `The budget "${budgetToDelete.name}" has been deleted.`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -91,7 +139,7 @@ export function BudgetManager() {
                                     <div className="flex flex-wrap gap-1 max-w-xs">
                                         {budget.targetIds.length > 0 ? budget.targetIds.map(id => (
                                             <Badge key={id} variant="outline">{getTargetName(id)}</Badge>
-                                        )) : <span className="text-muted-foreground">N/A</span>}
+                                        )) : <span className="text-muted-foreground">Any</span>}
                                     </div>
                                 </TableCell>
                                  <TableCell>
@@ -114,13 +162,38 @@ export function BudgetManager() {
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
-                                    <Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4"/></Button>
+                                    <Button asChild variant="ghost" size="icon">
+                                        <Link href={`/budgets/edit/${budget.id}`}><Edit className="h-4 w-4"/></Link>
+                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                                <Trash2 className="h-4 w-4"/>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the budget "{budget.name}".
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(budget.id)}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+                 {budgets.length === 0 && (
+                    <div className="text-center p-8 text-muted-foreground">
+                        No budgets found. <Link href="/budgets/create" className="text-primary hover:underline">Create one now</Link>.
+                    </div>
+                )}
             </CardContent>
         </Card>
     </div>

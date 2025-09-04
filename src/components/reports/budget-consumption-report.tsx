@@ -1,6 +1,7 @@
 
 "use client"
 
+import { useState, useEffect } from "react";
 import {
   Bar,
   BarChart,
@@ -22,8 +23,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { type Budget } from "@/types";
 
 export function BudgetConsumptionReport() {
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+
+  useEffect(() => {
+    // Load budgets from localStorage on component mount
+    const storedBudgets = localStorage.getItem('budgets');
+    if (storedBudgets) {
+      setBudgets(JSON.parse(storedBudgets));
+    } else {
+      setBudgets(initialBudgets);
+    }
+  }, []);
+
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -43,13 +57,17 @@ export function BudgetConsumptionReport() {
             </CardHeader>
             <CardContent className="pl-2">
                 <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={initialBudgets}>
+                <BarChart data={budgets}>
                     <XAxis
                         dataKey="name"
                         stroke="#888888"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
                     />
                     <YAxis
                         stroke="#888888"
@@ -91,7 +109,7 @@ export function BudgetConsumptionReport() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {initialBudgets.map(budget => {
+                        {budgets.map(budget => {
                             const consumption = budget.totalAmount > 0 ? (budget.spentAmount / budget.totalAmount) * 100 : 0;
                             return (
                                 <TableRow key={budget.id}>
@@ -104,6 +122,13 @@ export function BudgetConsumptionReport() {
                                 </TableRow>
                             )
                         })}
+                         {budgets.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center h-24">
+                                    No budget data found.
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </CardContent>

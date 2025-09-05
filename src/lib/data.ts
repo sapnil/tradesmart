@@ -192,6 +192,33 @@ export const promotions: Promotion[] = [
     qpsDurationMonths: 3,
     qpsReward: 'All-expenses-paid trip to Paris for 2',
   },
+  {
+    id: 'PROMO-010',
+    schemeName: 'Q3 Distributor Bulk Discount',
+    promotionLevel: 'Primary',
+    status: 'Active',
+    startDate: '2024-07-01',
+    endDate: '2024-09-30',
+    type: 'Discount',
+    uplift: 0,
+    products: [],
+    hierarchyIds: ['HIER-R1', 'HIER-R2'],
+    productHierarchyIds: ['CAT-1'],
+    discountPercentage: 5,
+  },
+  {
+    id: 'PROMO-011',
+    schemeName: 'Annual Growth Rebate',
+    promotionLevel: 'Primary',
+    status: 'Active',
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    type: 'Rebate and Loyalty Programs',
+    uplift: 0,
+    products: [],
+    hierarchyIds: ['HIER-D1', 'HIER-D2', 'HIER-D3'],
+    productHierarchyIds: ['CAT-1', 'CAT-2'],
+  },
 ];
 
 export const orders: Order[] = [

@@ -33,6 +33,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
+import { orderTypes } from "@/types";
 
 const orderItemSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -42,6 +43,7 @@ const orderItemSchema = z.object({
 const formSchema = z.object({
   distributorId: z.string().min(1, { message: "Please select a distributor." }),
   orderDate: z.date(),
+  orderType: z.enum(orderTypes),
   items: z.array(orderItemSchema).min(1, "Order must have at least one item."),
 });
 
@@ -55,6 +57,7 @@ export function TestOrderSimulator() {
     defaultValues: {
         distributorId: "",
         orderDate: new Date(),
+        orderType: 'Retail',
         items: [{ productId: "", quantity: 1 }],
     },
   });
@@ -81,6 +84,7 @@ export function TestOrderSimulator() {
         id: `TEST-${Date.now()}`,
         distributorName: distributor.name,
         date: format(values.orderDate, 'yyyy-MM-dd'),
+        orderType: values.orderType,
         status: 'Pending',
         items: values.items.map(item => {
             const product = products.find(p => p.id === item.productId);
@@ -179,6 +183,30 @@ export function TestOrderSimulator() {
                             />
                         </PopoverContent>
                         </Popover>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="orderType"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Order Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                            <SelectValue placeholder="Select an order type" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {orderTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                                {type}
+                            </SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
                         <FormMessage />
                     </FormItem>
                     )}

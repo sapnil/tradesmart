@@ -222,74 +222,92 @@ export const promotions: Promotion[] = [
 ];
 
 export const orders: Order[] = [
-    { 
-        id: 'ORD-001', 
-        distributorName: 'Gupta Distributors', 
-        date: '2024-08-12', 
-        amount: 45000, 
-        status: 'Fulfilled', 
+    {
+        id: 'ORD-001',
+        distributorName: 'Gupta Distributors',
+        date: '2024-08-12',
+        amount: 45000,
+        status: 'Fulfilled',
         appliedPromotionId: 'PROMO-001',
+        orderType: 'Retail',
         items: [
             { productId: 'PROD-001', quantity: 200, price: 20 },
             { productId: 'PROD-003', quantity: 100, price: 25 },
         ],
     },
-    { 
-        id: 'ORD-002', 
-        distributorName: 'Patel Trading Co.', 
-        date: '2024-08-12', 
-        amount: 78000, 
-        status: 'Pending', 
+    {
+        id: 'ORD-002',
+        distributorName: 'Patel Trading Co.',
+        date: '2024-08-12',
+        amount: 78000,
+        status: 'Pending',
         appliedPromotionId: 'PROMO-002',
+        orderType: 'Retail',
         items: [
             { productId: 'PROD-002', quantity: 150, price: 35 },
             { productId: 'PROD-004', quantity: 100, price: 35 },
             { productId: 'PROD-005', quantity: 50, price: 22 },
         ],
     },
-    { 
-        id: 'ORD-003', 
-        distributorName: 'Sharma & Sons', 
-        date: '2024-08-11', 
-        amount: 23500, 
+    {
+        id: 'ORD-003',
+        distributorName: 'Sharma & Sons',
+        date: '2024-08-11',
+        amount: 23500,
         status: 'Fulfilled',
+        orderType: 'Retail',
         items: [
             { productId: 'PROD-001', quantity: 50, price: 20 },
             { productId: 'PROD-003', quantity: 150, price: 25 },
         ],
     },
-    { 
-        id: 'ORD-004', 
-        distributorName: 'Modern Traders', 
-        date: '2024-08-10', 
-        amount: 112000, 
-        status: 'Fulfilled', 
+    {
+        id: 'ORD-004',
+        distributorName: 'Modern Traders',
+        date: '2024-08-10',
+        amount: 112000,
+        status: 'Fulfilled',
         appliedPromotionId: 'PROMO-001',
+        orderType: 'Retail',
         items: [
             { productId: 'PROD-001', quantity: 1000, price: 20 },
             { productId: 'PROD-002', quantity: 500, price: 35 },
             { productId: 'PROD-004', quantity: 200, price: 35 },
         ],
     },
-    { 
-        id: 'ORD-005', 
-        distributorName: 'Gupta Distributors', 
-        date: '2024-08-09', 
-        amount: 32000, 
+    {
+        id: 'ORD-005',
+        distributorName: 'Gupta Distributors',
+        date: '2024-08-09',
+        amount: 32000,
         status: 'Cancelled',
+        orderType: 'Retail',
         items: [
             { productId: 'PROD-001', quantity: 1000, price: 20 },
             { productId: 'PROD-005', quantity: 200, price: 22 },
         ],
     },
-    { 
-        id: 'ORD-006', 
-        distributorName: 'Southern Wholesalers', 
-        date: '2024-08-08', 
-        amount: 56000, 
+    {
+        id: 'ORD-006',
+        distributorName: 'Southern Wholesalers',
+        date: '2024-08-08',
+        amount: 56000,
         status: 'Fulfilled',
+        orderType: 'Retail',
         items: [
             { productId: 'PROD-002', quantity: 400, price: 35 },
+        ],
+    },
+    {
+        id: 'ORD-PO-001',
+        distributorName: 'Gupta Distributors',
+        date: '2024-08-15',
+        amount: 500000,
+        status: 'Pending',
+        orderType: 'Purchase',
+        items: [
+            { productId: 'PROD-001', quantity: 10000, price: 20 },
+            { productId: 'PROD-002', quantity: 5000, price: 35 },
         ],
     },
 ];

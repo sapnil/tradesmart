@@ -104,6 +104,12 @@ export default function ViewOrderPage({ params }: { params: { id: string } }) {
                         <span className="font-medium">{order.date}</span>
                     </div>
                     <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Order Type</span>
+                        <Badge variant={order.orderType === 'Purchase' ? 'default' : 'secondary'}>
+                            {order.orderType}
+                        </Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Status</span>
                          <Badge
                             variant={

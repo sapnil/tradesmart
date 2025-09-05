@@ -10,6 +10,9 @@ export type SalesData = {
 export const promotionLevels = ['Primary', 'Secondary'] as const;
 export type PromotionLevel = (typeof promotionLevels)[number];
 
+export const orderTypes = ['Retail', 'Purchase'] as const;
+export type OrderType = (typeof orderTypes)[number];
+
 
 export const promotionTypes = [
   'Discount',
@@ -125,6 +128,7 @@ export type Order = {
   status: 'Pending' | 'Fulfilled' | 'Cancelled';
   appliedPromotionId?: string;
   items: OrderItem[];
+  orderType: OrderType;
 };
 
 export type SentNotification = {

@@ -46,6 +46,7 @@ export default function OrdersPage() {
                 <TableHead>Order ID</TableHead>
                 <TableHead>Distributor</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Applied Scheme</TableHead>
@@ -61,6 +62,11 @@ export default function OrdersPage() {
                   </TableCell>
                   <TableCell>{order.distributorName}</TableCell>
                   <TableCell>{order.date}</TableCell>
+                   <TableCell>
+                    <Badge variant={order.orderType === 'Purchase' ? 'default' : 'secondary'}>
+                      {order.orderType}
+                    </Badge>
+                  </TableCell>
                   <TableCell>
                     {new Intl.NumberFormat("en-IN", {
                       style: "currency",

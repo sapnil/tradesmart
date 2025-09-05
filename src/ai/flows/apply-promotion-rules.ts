@@ -39,17 +39,18 @@ const prompt = ai.definePrompt({
   {{{promotionsJson}}}
 
   Follow these steps carefully:
-  1. For EACH promotion, check if the order satisfies ALL its conditions (hierarchy, groups, products, quantities, dates, type).
-  2. The promotion's 'hierarchyIds' must contain a hierarchy element that the order's distributor belongs to. Use the organization hierarchy to trace parentage.
-  3. If 'organizationGroupIds' is present, check if the order's distributor belongs to any of the specified groups.
-  4. The promotion's 'productHierarchyIds' must contain a product hierarchy element that at least one item in the order belongs to. Use the product hierarchy to trace parentage.
-  5. **Handle different promotion types**:
+  1.  Determine the order type from the order details. If the order type is 'Purchase', only consider promotions with 'promotionLevel' set to 'Primary'. If the order type is 'Retail', only consider promotions with 'promotionLevel' set to 'Secondary'.
+  2.  For EACH eligible promotion, check if the order satisfies ALL its conditions (hierarchy, groups, products, quantities, dates, type).
+  3.  The promotion's 'hierarchyIds' must contain a hierarchy element that the order's distributor belongs to. Use the organization hierarchy to trace parentage.
+  4.  If 'organizationGroupIds' is present, check if the order's distributor belongs to any of the specified groups.
+  5.  The promotion's 'productHierarchyIds' must contain a product hierarchy element that at least one item in the order belongs to. Use the product hierarchy to trace parentage.
+  6.  **Handle different promotion types**:
      - If the promotion type is **'Quantity-Based Freebie (Buy X, Get Y)'**, check if the order satisfies the specific product rules in the 'products' array (e.g., buy X quantity of Product A to get Y quantity of Product B).
      - If the promotion type is **'Tiered Volume Discount'**, calculate the total quantity of all items in the order that belong to the promotion's 'productHierarchyIds'. Then, check this total quantity against the 'discountTiers' to see if it qualifies for any tier.
      - For other types like **'Discount'**, simply check if the hierarchies match.
-  6. If multiple promotions are applicable, choose the one that offers the best value or is most specific. If no promotions are applicable, state that clearly.
-  7. Provide a 'bestPromotionId' which should be the ID of the selected promotion, or null if none apply.
-  8. In the 'reasoning' field, provide a detailed, step-by-step explanation for your choice. Explain which rules were checked for the most likely promotions and what the outcome was (pass/fail). This is the most important part of the output.
+  7.  If multiple promotions are applicable, choose the one that offers the best value or is most specific. If no promotions are applicable, state that clearly.
+  8.  Provide a 'bestPromotionId' which should be the ID of the selected promotion, or null if none apply.
+  9.  In the 'reasoning' field, provide a detailed, step-by-step explanation for your choice. Explain which rules were checked for the most likely promotions and what the outcome was (pass/fail). This is the most important part of the output.
   `,
 });
 

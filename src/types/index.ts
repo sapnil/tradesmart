@@ -7,6 +7,10 @@ export type SalesData = {
   sales: number;
 };
 
+export const promotionLevels = ['Primary', 'Secondary'] as const;
+export type PromotionLevel = (typeof promotionLevels)[number];
+
+
 export const promotionTypes = [
   'Discount',
   'Tiered Volume Discount',
@@ -85,6 +89,7 @@ export type OrganizationGroup = {
 export type Promotion = {
   id: string;
   schemeName: string;
+  promotionLevel: PromotionLevel;
   status: 'Active' | 'Upcoming' | 'Expired';
   startDate: string;
   endDate: string;

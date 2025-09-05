@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -201,6 +202,7 @@ export default function PromotionsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Scheme Name</TableHead>
+                <TableHead>Level</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Start Date</TableHead>
@@ -215,6 +217,11 @@ export default function PromotionsPage() {
                     <Link href={`/promotions/${promo.id}/edit`} className="hover:underline">
                       {promo.schemeName}
                     </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={promo.promotionLevel === 'Primary' ? 'default' : 'secondary'}>
+                        {promo.promotionLevel}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={promo.status === 'Active' ? 'default' : promo.status === 'Upcoming' ? 'secondary' : 'outline'} className={promo.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/20 hover:bg-green-500/30' : ''}>

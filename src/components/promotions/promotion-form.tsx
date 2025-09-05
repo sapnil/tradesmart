@@ -33,7 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CalendarIcon, PlusCircle, Sparkles, Trash, X, Loader2, Send } from "lucide-react";
 import { format } from "date-fns";
-import { promotionTypes, type Promotion, type DistributorInfo } from "@/types";
+import { promotionTypes, type Promotion, type DistributorInfo, promotionLevels } from "@/types";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -83,6 +83,7 @@ const mustBuyProductSchema = z.object({
 
 const formSchema = z.object({
   schemeName: z.string().min(3, "Scheme name must be at least 3 characters."),
+  promotionLevel: z.enum(promotionLevels),
   type: z.enum(promotionTypes),
   status: z.enum(["Active", "Upcoming", "Expired"]),
   startDate: z.date(),
@@ -116,6 +117,7 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     resolver: zodResolver(formSchema),
     defaultValues: {
       schemeName: promotion?.schemeName || "",
+      promotionLevel: promotion?.promotionLevel || "Primary",
       type: promotion?.type || "Discount",
       status: promotion?.status || "Upcoming",
       startDate: promotion?.startDate ? new Date(promotion.startDate) : new Date(),
@@ -251,7 +253,32 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                   </FormItem>
                 )}
               />
-              <FormField
+               <FormField
+                control={form.control}
+                name="promotionLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Promotion Level</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {promotionLevels.map((level) => (
+                          <SelectItem key={level} value={level}>
+                            {level}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>Primary is for distributors, Secondary for retailers.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (

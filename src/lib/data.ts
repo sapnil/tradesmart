@@ -1,5 +1,4 @@
 
-
 import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup, SentNotification, Budget } from '@/types';
 
 export const salesData: SalesData[] = [
@@ -56,7 +55,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-001',
     schemeName: 'Monsoon Bonanza',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Active',
     startDate: '2024-07-01',
     endDate: '2024-08-31',
@@ -71,7 +70,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-002',
     schemeName: 'Independence Day Special',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Active',
     startDate: '2024-08-10',
     endDate: '2024-08-20',
@@ -90,7 +89,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-003',
     schemeName: 'Diwali Dhamaka',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Upcoming',
     startDate: '2024-10-15',
     endDate: '2024-11-15',
@@ -103,7 +102,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-004',
     schemeName: 'Summer Cooler Offer',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Expired',
     startDate: '2024-04-01',
     endDate: '2024-05-31',
@@ -116,7 +115,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-005',
     schemeName: 'Holi Hungama',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Expired',
     startDate: '2024-03-10',
     endDate: '2024-03-25',
@@ -130,7 +129,7 @@ export const promotions: Promotion[] = [
    {
     id: 'PROMO-006',
     schemeName: 'Tiered Volume Push',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Active',
     startDate: '2024-08-01',
     endDate: '2024-09-30',
@@ -148,7 +147,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-007',
     schemeName: 'Value-Based Offer',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Upcoming',
     startDate: '2024-09-01',
     endDate: '2024-09-30',
@@ -163,7 +162,7 @@ export const promotions: Promotion[] = [
   {
     id: 'PROMO-008',
     schemeName: 'Must Stock Offer',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Active',
     startDate: '2024-08-15',
     endDate: '2024-09-15',
@@ -180,7 +179,7 @@ export const promotions: Promotion[] = [
    {
     id: 'PROMO-009',
     schemeName: 'Q3 Sales Champion',
-    promotionLevel: 'Primary',
+    promotionLevel: 'Secondary',
     status: 'Active',
     startDate: '2024-07-01',
     endDate: '2024-09-30',

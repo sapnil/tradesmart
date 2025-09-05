@@ -75,10 +75,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
-    { href: "/budgets", icon: Wallet, label: "Budgets"},
     { href: "/products", icon: Boxes, label: "Products" },
     { href: "/hierarchy", icon: Building, label: "Organization Hierarchy" },
   ];
+
+  const budgetNavItems = [
+    { href: "/budgets", icon: Wallet, label: "Manage Budgets"},
+    { href: "/budget-simulator", icon: Bot, label: "Budget Simulator" },
+  ]
 
   const promotionNavItems = [
     { href: "/promotions", icon: Megaphone, label: "Manage Promotions" },
@@ -93,7 +97,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const aiToolsNavItems = [
     { href: "/insights", icon: Lightbulb, label: "Insights" },
     { href: "/ai-schemes", icon: Bot, label: "AI Schemes" },
-    { href: "/budget-simulator", icon: Wallet, label: "Budget Simulator" },
     { href: "/anomaly-detector", icon: ShieldAlert, label: "Anomaly Detector" },
     { href: "/competitor-analysis", icon: Telescope, label: "Competitor Analysis" },
   ];
@@ -131,6 +134,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
+           <SidebarGroup>
+            <SidebarGroupLabel>Budgets</SidebarGroupLabel>
+            <SidebarMenu>
+              {budgetNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel>Promotions</SidebarGroupLabel>
             <SidebarMenu>

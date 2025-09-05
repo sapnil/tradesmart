@@ -24,14 +24,13 @@ import {
   organizationGroups,
 } from "@/lib/data";
 import Link from "next/link";
-import { type Promotion, type OrganizationHierarchy } from "@/types";
+import { type Promotion, type OrganizationHierarchy, type PromotionLevel } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-type PromotionStatus = 'Active' | 'Upcoming' | 'Expired';
 
 export function DistributorSchemeReport() {
   const [selectedDistributorId, setSelectedDistributorId] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const distributors = organizationHierarchy.filter(h => h.level === 'Distributor');
 
@@ -57,18 +56,23 @@ export function DistributorSchemeReport() {
     const distributorHierarchyIds = getDistributorAncestors(selectedDistributorId, organizationHierarchy);
     const distributorGroupIds = new Set(getDistributorGroups(selectedDistributorId));
     
-    const allTargeted = promotions.filter(promo => {
+    let allTargeted = promotions.filter(promo => {
         const hierarchyMatch = promo.hierarchyIds.some(id => distributorHierarchyIds.has(id));
         const groupMatch = promo.organizationGroupIds?.some(id => distributorGroupIds.has(id));
         return hierarchyMatch || groupMatch;
     });
 
-    if (selectedStatus === 'all') {
-        return allTargeted;
+    if (selectedStatus !== 'all') {
+        allTargeted = allTargeted.filter(promo => promo.status === selectedStatus);
     }
-    return allTargeted.filter(promo => promo.status === selectedStatus);
+    
+    if (selectedCategory !== 'all') {
+        allTargeted = allTargeted.filter(promo => promo.promotionLevel === selectedCategory);
+    }
 
-  }, [selectedDistributorId, selectedStatus]);
+    return allTargeted;
+
+  }, [selectedDistributorId, selectedStatus, selectedCategory]);
 
   return (
     <Card>
@@ -97,6 +101,16 @@ export function DistributorSchemeReport() {
                     <SelectItem value="Active">Active</SelectItem>
                     <SelectItem value="Upcoming">Upcoming</SelectItem>
                     <SelectItem value="Expired">Expired</SelectItem>
+                </SelectContent>
+            </Select>
+             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="Primary">Primary</SelectItem>
+                    <SelectItem value="Secondary">Secondary</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -141,7 +155,7 @@ export function DistributorSchemeReport() {
             ) : (
                 <TableRow>
                     <TableCell colSpan={6} className="text-center h-24">
-                        No schemes found for this distributor with the selected status.
+                        No schemes found for the selected criteria.
                     </TableCell>
                 </TableRow>
             )

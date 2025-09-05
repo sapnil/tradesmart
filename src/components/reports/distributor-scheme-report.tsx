@@ -106,6 +106,7 @@ export function DistributorSchemeReport() {
           <TableHeader>
             <TableRow>
               <TableHead>Scheme Name</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Start Date</TableHead>
@@ -122,6 +123,11 @@ export function DistributorSchemeReport() {
                             {promo.schemeName}
                         </Link>
                     </TableCell>
+                    <TableCell>
+                        <Badge variant={promo.promotionLevel === 'Primary' ? 'default' : 'secondary'}>
+                            {promo.promotionLevel}
+                        </Badge>
+                    </TableCell>
                     <TableCell>{promo.type}</TableCell>
                     <TableCell>
                       <Badge variant={promo.status === 'Active' ? 'default' : promo.status === 'Upcoming' ? 'secondary' : 'outline'} className={promo.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/20 hover:bg-green-500/30' : ''}>
@@ -134,14 +140,14 @@ export function DistributorSchemeReport() {
                 ))
             ) : (
                 <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
+                    <TableCell colSpan={6} className="text-center h-24">
                         No schemes found for this distributor with the selected status.
                     </TableCell>
                 </TableRow>
             )
             ) : (
                  <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
                         Please select a distributor to see the report.
                     </TableCell>
                 </TableRow>

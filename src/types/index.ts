@@ -14,28 +14,32 @@ export const orderTypes = ['Retail', 'Purchase'] as const;
 export type OrderType = (typeof orderTypes)[number];
 
 
-export const promotionTypes = [
+export const primaryPromotionTypes = [
+    'Discount',
+    'Value-Based Discount',
+    'Forced-Buy / Must-Stock',
+    'QPS (Long-Term Incentive)',
+    'Rebate and Loyalty Programs',
+] as const;
+
+export const secondaryPromotionTypes = [
   'Discount',
   'Tiered Volume Discount',
   'Quantity-Based Freebie (Buy X, Get Y)',
   'Bundle',
   'Value-Based Discount',
   'Forced-Buy / Must-Stock',
-  'QPS (Long-Term Incentive)',
-  'Rebate and Loyalty Programs',
-  'Free Goods and Sampling Schemes',
-  'Channel-Specific Schemes',
-  'Retailer Channel-Group Specific Schemes',
-  'Strategic Implementation Approaches',
-  'Seasonal and Geographic Promotions',
-  'Liquidation Schemes',
-  'Cross-Sell and Bundling Programs',
-  'Performance-Driven Incentives',
-  'Trade Contests and Incentives',
-  'Display and Visibility Support',
-  'Freebie',
   'Contest',
+  'Freebie',
 ] as const;
+
+export const promotionTypes = [...new Set([...primaryPromotionTypes, ...secondaryPromotionTypes])] as const;
+
+export const promotionTypeLevels: Record<PromotionLevel, readonly string[]> = {
+    Primary: primaryPromotionTypes,
+    Secondary: secondaryPromotionTypes,
+};
+
 
 export type PromotionType = (typeof promotionTypes)[number];
 

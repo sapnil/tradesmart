@@ -33,7 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CalendarIcon, PlusCircle, Sparkles, Trash, X, Loader2, Send } from "lucide-react";
 import { format } from "date-fns";
-import { promotionTypes, type Promotion, type DistributorInfo, promotionLevels } from "@/types";
+import { type Promotion, type DistributorInfo, promotionLevels, promotionTypeLevels, PromotionType } from "@/types";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -52,7 +52,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { predictPromotionUplift } from "@/ai/flows/predict-promotion-uplift";
 import { PredictPromotionUpliftOutput } from "@/types/promotions";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "../ui/textarea";
 import { generateNotification } from "@/ai/flows/generate-notification";
@@ -84,7 +84,7 @@ const mustBuyProductSchema = z.object({
 const formSchema = z.object({
   schemeName: z.string().min(3, "Scheme name must be at least 3 characters."),
   promotionLevel: z.enum(promotionLevels),
-  type: z.enum(promotionTypes),
+  type: z.custom<PromotionType>(val => typeof val === 'string' && val, "Promotion Type is required."),
   status: z.enum(["Active", "Upcoming", "Expired"]),
   startDate: z.date(),
   endDate: z.date(),
@@ -117,8 +117,8 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     resolver: zodResolver(formSchema),
     defaultValues: {
       schemeName: promotion?.schemeName || "",
-      promotionLevel: promotion?.promotionLevel || "Primary",
-      type: promotion?.type || "Discount",
+      promotionLevel: promotion?.promotionLevel || "Secondary",
+      type: promotion?.type,
       status: promotion?.status || "Upcoming",
       startDate: promotion?.startDate ? new Date(promotion.startDate) : new Date(),
       endDate: promotion?.endDate ? new Date(promotion.endDate) : new Date(new Date().setDate(new Date().getDate() + 30)),
@@ -159,6 +159,12 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
     control: form.control,
     name: "mustBuyProducts",
   });
+
+  const selectedLevel = form.watch("promotionLevel");
+
+  const availablePromotionTypes = useMemo(() => {
+    return promotionTypeLevels[selectedLevel] || [];
+  }, [selectedLevel]);
 
   const handlePredictUplift = async () => {
     setIsPredicting(true);
@@ -229,37 +235,19 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
             />
 
             <div className="grid md:grid-cols-2 gap-8">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Promotion Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a promotion type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {promotionTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
                <FormField
                 control={form.control}
                 name="promotionLevel"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Promotion Level</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                        onValueChange={(value) => {
+                            field.onChange(value);
+                            form.setValue('type', "" as any, { shouldValidate: true });
+                        }} 
+                        defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a level" />
@@ -274,6 +262,30 @@ export function PromotionForm({ promotion }: { promotion?: Partial<Promotion> })
                       </SelectContent>
                     </Select>
                     <FormDescription>Primary is for distributors, Secondary for retailers.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Promotion Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a promotion type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availablePromotionTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -6,6 +6,7 @@ import {
   Rule,
   Condition,
   Action,
+  ConditionGroup,
   ConditionType,
   ActionType,
   conditionTypes,
@@ -28,6 +29,7 @@ import { products, organizationHierarchy, productHierarchy } from "@/lib/data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 // Helper to generate a unique ID
 const generateId = () => `_${Math.random().toString(36).substr(2, 9)}`;
@@ -39,9 +41,11 @@ const getDefaultConditionConfig = (type: ConditionType) => {
       return { startDate: new Date().toISOString(), endDate: new Date().toISOString() };
     case "customerHierarchy":
     case "productHierarchy":
-    case "totalOrderValue":
-    case "totalOrderQuantity":
       return { hierarchyIds: [] };
+    case "totalOrderValue":
+        return { productHierarchyIds: [], value: 0 };
+    case "totalOrderQuantity":
+        return { productHierarchyIds: [], quantity: 1 };
     case "productPurchase":
       return { productId: "", quantity: 1 };
     default:
@@ -256,34 +260,64 @@ const ActionBlock: React.FC<ActionBlockProps> = ({ action, onUpdate, onRemove })
 
 export function RuleBuilder() {
     const { toast } = useToast();
-  const [rule, setRule] = useState<Rule>({
-    id: generateId(),
-    name: "",
-    description: "",
-    conditions: [],
-    actions: [],
-  });
+    const [rule, setRule] = useState<Rule>({
+        id: generateId(),
+        name: "",
+        description: "",
+        conditionGroups: [{ id: generateId(), conditions: [] }],
+        actions: [],
+    });
 
-  const addCondition = (type: ConditionType) => {
+  const addCondition = (groupId: string, type: ConditionType) => {
     const newCondition: Condition = {
       id: generateId(),
       type,
       config: getDefaultConditionConfig(type),
     };
-    setRule((prev) => ({ ...prev, conditions: [...prev.conditions, newCondition] }));
+    setRule((prev) => ({
+        ...prev,
+        conditionGroups: prev.conditionGroups.map(group => 
+            group.id === groupId 
+            ? { ...group, conditions: [...group.conditions, newCondition] }
+            : group
+        )
+    }));
+  };
+  
+  const addConditionGroup = () => {
+    const newGroup: ConditionGroup = {
+        id: generateId(),
+        conditions: [],
+    };
+    setRule((prev) => ({ ...prev, conditionGroups: [...prev.conditionGroups, newGroup] }));
   };
 
-  const updateCondition = (id: string, config: any) => {
+  const updateCondition = (groupId: string, conditionId: string, config: any) => {
     setRule((prev) => ({
       ...prev,
-      conditions: prev.conditions.map((c) => (c.id === id ? { ...c, config } : c)),
+      conditionGroups: prev.conditionGroups.map(group => 
+        group.id === groupId
+        ? { ...group, conditions: group.conditions.map(c => c.id === conditionId ? { ...c, config } : c) }
+        : group
+      )
     }));
   };
 
-  const removeCondition = (id: string) => {
+  const removeCondition = (groupId: string, conditionId: string) => {
     setRule((prev) => ({
       ...prev,
-      conditions: prev.conditions.filter((c) => c.id !== id),
+      conditionGroups: prev.conditionGroups.map(group => 
+        group.id === groupId
+        ? { ...group, conditions: group.conditions.filter((c) => c.id !== conditionId) }
+        : group
+      )
+    }));
+  };
+
+  const removeConditionGroup = (groupId: string) => {
+    setRule((prev) => ({
+        ...prev,
+        conditionGroups: prev.conditionGroups.filter(group => group.id !== groupId)
     }));
   };
 
@@ -354,25 +388,52 @@ export function RuleBuilder() {
       <Card>
         <CardHeader>
           <CardTitle>Conditions</CardTitle>
-          <CardDescription>All of these conditions must be met for the actions to trigger.</CardDescription>
+          <CardDescription>The rule will apply if ANY of these condition groups are met. All conditions within a single group must be met (AND).</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div className="space-y-4">
-                {rule.conditions.map(condition => (
-                    <ConditionBlock key={condition.id} condition={condition} onUpdate={updateCondition} onRemove={removeCondition} />
-                ))}
-            </div>
+            {rule.conditionGroups.map((group, groupIndex) => (
+                <div key={group.id} className="space-y-4">
+                    <Card className="border-dashed">
+                        <CardHeader className="flex-row items-center justify-between p-4">
+                             <p className="text-sm font-semibold">Condition Group {groupIndex + 1}</p>
+                             <Button variant="ghost" size="icon" onClick={() => removeConditionGroup(group.id)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="space-y-4 p-4 pt-0">
+                             {group.conditions.map(condition => (
+                                <ConditionBlock 
+                                    key={condition.id} 
+                                    condition={condition} 
+                                    onUpdate={(id, config) => updateCondition(group.id, id, config)} 
+                                    onRemove={(id) => removeCondition(group.id, id)} 
+                                />
+                            ))}
+                            {group.conditions.length === 0 && <p className="text-sm text-muted-foreground text-center p-4">Add a condition to this group.</p>}
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline"><Plus className="mr-2 h-4 w-4" /> Add Condition</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    {conditionTypes.map(type => (
-                        <DropdownMenuItem key={type} onClick={() => addCondition(type)}>{conditionLabels[type]}</DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm"><Plus className="mr-2 h-4 w-4" /> Add Condition</Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    {conditionTypes.map(type => (
+                                        <DropdownMenuItem key={type} onClick={() => addCondition(group.id, type)}>{conditionLabels[type]}</DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </CardContent>
+                    </Card>
+
+                    {groupIndex < rule.conditionGroups.length - 1 && (
+                         <div className="flex items-center justify-center">
+                            <Separator className="w-1/3" />
+                            <span className="mx-4 text-xs font-semibold text-muted-foreground">OR</span>
+                            <Separator className="w-1/3" />
+                        </div>
+                    )}
+                </div>
+            ))}
+             <Button variant="outline" onClick={addConditionGroup}><Plus className="mr-2 h-4 w-4" /> Add Condition Group (OR)</Button>
         </CardContent>
       </Card>
 

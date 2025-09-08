@@ -67,6 +67,12 @@ export const ConditionSchema = z.object({
 });
 export type Condition = z.infer<typeof ConditionSchema>;
 
+export const ConditionGroupSchema = z.object({
+    id: z.string(),
+    conditions: z.array(ConditionSchema),
+});
+export type ConditionGroup = z.infer<typeof ConditionGroupSchema>;
+
 // #endregion
 
 // #region -------- Action Types --------
@@ -128,7 +134,7 @@ export const RuleSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
-  conditions: z.array(ConditionSchema),
+  conditionGroups: z.array(ConditionGroupSchema),
   actions: z.array(ActionSchema),
 });
 export type Rule = z.infer<typeof RuleSchema>;

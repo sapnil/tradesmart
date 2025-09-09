@@ -13,11 +13,11 @@ export const salesData: SalesData[] = [
 ];
 
 export const products: Product[] = [
-    { id: 'PROD-001', name: 'Cool Cola 300ml', sku: 'CC300' },
-    { id: 'PROD-002', name: 'Cool Cola 500ml', sku: 'CC500' },
-    { id: 'PROD-003', name: 'Zesty Orange 300ml', sku: 'ZO300' },
-    { id: 'PROD-004', name: 'Zesty Orange 500ml', sku: 'ZO500' },
-    { id: 'PROD-005', name: 'Lemon-Lime Burst 300ml', sku: 'LLB300' },
+    { id: 'PROD-001', name: 'Cool Cola 300ml', sku: 'CC300', price: 20 },
+    { id: 'PROD-002', name: 'Cool Cola 500ml', sku: 'CC500', price: 35 },
+    { id: 'PROD-003', name: 'Zesty Orange 300ml', sku: 'ZO300', price: 22 },
+    { id: 'PROD-004', name: 'Zesty Orange 500ml', sku: 'ZO500', price: 38 },
+    { id: 'PROD-005', name: 'Lemon-Lime Burst 300ml', sku: 'LLB300', price: 21 },
 ];
 
 export const productHierarchy: ProductHierarchy[] = [

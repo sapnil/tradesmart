@@ -1,5 +1,8 @@
 
+'use client';
 
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -48,6 +51,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function Logo() {
   return (
@@ -72,6 +76,24 @@ function Logo() {
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (isLoggedIn !== 'true') {
+      router.replace('/login');
+    } else {
+      setIsAuthenticating(false);
+    }
+  }, [router]);
+  
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    router.replace('/login');
+  };
+
   const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
@@ -115,6 +137,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/dynamic-rule-simulator", icon: BookCopy, label: "Dynamic Rule Simulator"},
   ];
 
+  if (isAuthenticating) {
+    return (
+        <div className="flex h-screen w-screen items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                </div>
+            </div>
+        </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -125,7 +161,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {mainNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild tooltip={item.label}>
+                <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                   <Link href={item.href}>
                     <item.icon />
                     <span>{item.label}</span>
@@ -139,7 +175,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {budgetNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -154,7 +190,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {promotionNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -169,7 +205,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {aiToolsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -184,7 +220,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {reportsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -199,7 +235,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {setupNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -214,7 +250,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {experimentalNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -263,7 +299,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Log out</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

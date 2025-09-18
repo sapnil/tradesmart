@@ -83,6 +83,9 @@ export const SimulatePromotionImpactInputSchema = z.object({
     .describe(
       'The ID of the organization hierarchy node (e.g., Region, State) to run the simulation on.'
     ),
+  seasonality: z.enum(['Normal', 'Peak Season', 'Off-Season']).describe('The general sales season.'),
+  competitorActivity: z.string().optional().describe('A description of known competitor promotions or activities.'),
+  localEvents: z.string().optional().describe('A description of any major local events or holidays during the promotion period.'),
   promotionsJson: z
     .string()
     .describe('A JSON string of all available promotions.'),

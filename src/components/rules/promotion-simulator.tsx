@@ -27,10 +27,14 @@ import { Loader2, Sparkles, Wand2, Users, Percent, DollarSign } from "lucide-rea
 import { orders, promotions, organizationHierarchy, salesData } from "@/lib/data";
 import { simulatePromotionImpact } from "@/ai/flows/simulate-promotion-impact";
 import { SimulatePromotionImpactOutput } from "@/types/promotions";
+import { Textarea } from "../ui/textarea";
 
 const formSchema = z.object({
   promotionId: z.string().min(1, { message: "Please select a promotion." }),
   hierarchyId: z.string().min(1, { message: "Please select a hierarchy level." }),
+  seasonality: z.enum(['Normal', 'Peak Season', 'Off-Season']),
+  competitorActivity: z.string().optional(),
+  localEvents: z.string().optional(),
 });
 
 export function PromotionSimulator() {
@@ -40,7 +44,11 @@ export function PromotionSimulator() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+        seasonality: 'Normal',
+        competitorActivity: '',
+        localEvents: '',
+    },
   });
   
   const formatCurrency = (amount: number) =>
@@ -132,6 +140,56 @@ export function PromotionSimulator() {
                   </FormItem>
                 )}
               />
+               <FormField
+                control={form.control}
+                name="seasonality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Seasonality</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select seasonality" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Normal">Normal</SelectItem>
+                        <SelectItem value="Peak Season">Peak Season</SelectItem>
+                        <SelectItem value="Off-Season">Off-Season</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="competitorActivity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Competitor Activity (Optional)</FormLabel>
+                     <FormControl>
+                        <Textarea placeholder="e.g. 'Competitor X is running a 20% discount on similar products.'" {...field} />
+                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="localEvents"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Local Events / Holidays (Optional)</FormLabel>
+                     <FormControl>
+                        <Textarea placeholder="e.g. 'Local festival in the last week of the month.'" {...field} />
+                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+
               <Button type="submit" disabled={loading || !form.formState.isValid} className="w-full">
                 {loading ? (
                   <>

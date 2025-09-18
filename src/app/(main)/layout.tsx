@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -38,6 +39,7 @@ import {
   Bell,
   AreaChart,
   LineChart,
+  Globe,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -94,6 +96,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.replace('/login');
   };
 
+  if (isAuthenticating) {
+    return (
+        <div className="flex h-screen w-screen items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                </div>
+            </div>
+        </div>
+    );
+  }
   const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/orders", icon: ShoppingCart, label: "Orders" },
@@ -114,6 +129,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const setupNavItems = [
      { href: "/organization-groups", icon: Users, label: "Organization Groups" },
+     { href: "/external-factors", icon: Globe, label: "External Factors"},
   ];
 
   const aiToolsNavItems = [
@@ -137,19 +153,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/dynamic-rule-simulator", icon: BookCopy, label: "Dynamic Rule Simulator"},
   ];
 
-  if (isAuthenticating) {
-    return (
-        <div className="flex h-screen w-screen items-center justify-center">
-            <div className="flex flex-col items-center gap-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                </div>
-            </div>
-        </div>
-    );
-  }
 
   return (
     <SidebarProvider>

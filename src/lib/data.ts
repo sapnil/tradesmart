@@ -1,5 +1,6 @@
 
-import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup, SentNotification, Budget } from '@/types';
+
+import type { Promotion, SalesData, Product, OrganizationHierarchy, ProductHierarchy, Order, OrganizationGroup, SentNotification, Budget, ExternalFactor } from '@/types';
 
 export const salesData: SalesData[] = [
   { month: "Jan '24", sales: 2890 },
@@ -344,4 +345,34 @@ export const initialBudgets: Budget[] = [
     { id: 'BUD-002', name: 'Annual Maharashtra Budget', period: '2024', totalAmount: 2000000, allocatedAmount: 800000, spentAmount: 650000, targetIds: ['HIER-S3'], promotionTypes: [] },
     { id: 'BUD-003', name: 'Diwali Dhamaka Campaign', period: 'Q4 2024', totalAmount: 1000000, allocatedAmount: 0, spentAmount: 0, targetIds: [], promotionTypes: ['Contest'] },
     { id: 'BUD-004', name: 'Delhi Marketing Budget', period: 'Q3 2024', totalAmount: 100000, allocatedAmount: 0, spentAmount: 0, targetIds: ['HIER-S1'], parentId: 'BUD-001', promotionTypes: [] },
+];
+
+export const externalFactors: ExternalFactor[] = [
+    {
+        id: 'EF-001',
+        name: 'North India Heatwave',
+        type: 'Seasonality',
+        description: 'An extended period of unusually high temperatures across the North region, leading to increased demand for beverages.',
+        startDate: '2024-05-15',
+        endDate: '2024-06-30',
+        applicableHierarchyIds: ['HIER-R1'],
+    },
+    {
+        id: 'EF-002',
+        name: 'Competitor "FizzUp" Summer Campaign',
+        type: 'CompetitorActivity',
+        description: 'FizzUp is running a national buy-one-get-one-free campaign on all their 500ml SKUs.',
+        startDate: '2024-05-01',
+        endDate: '2024-06-30',
+        applicableHierarchyIds: ['HIER-R1', 'HIER-R2'],
+    },
+    {
+        id: 'EF-003',
+        name: 'Diwali Festival Period',
+        type: 'LocalEvent',
+        description: 'The national Diwali festival period, which sees a significant increase in consumer spending and gifting.',
+        startDate: '2024-10-25',
+        endDate: '2024-11-05',
+        applicableHierarchyIds: ['HIER-R1', 'HIER-R2'],
+    }
 ];

@@ -193,3 +193,17 @@ export type Budget = {
     promotionTypes: PromotionType[];
     parentId?: string;
 };
+
+export const externalFactorTypes = ['Seasonality', 'CompetitorActivity', 'LocalEvent'] as const;
+export type ExternalFactorType = (typeof externalFactorTypes)[number];
+
+export type ExternalFactor = {
+    id: string;
+    name: string;
+    type: ExternalFactorType;
+    description: string;
+    startDate: string;
+    endDate: string;
+    applicableHierarchyIds: string[];
+};
+
